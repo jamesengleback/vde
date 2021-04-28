@@ -1,6 +1,6 @@
 # todo - save structures
 
-
+import pandas as pd
 import enz
 import os
 import random
@@ -11,10 +11,12 @@ import numpy as np
 from tqdm import tqdm
 import argparse
 
-from bm3 import BM3_DM, ACTIVE_SITE_AAS
+from bm3 import BM3_WT, ACTIVE_SITE_AAS, DOCKING_SITE
 from score import score_mesotrione 
 
 ID = ''.join(random.choices(ascii_lowercase, k=5))
+OUTPATH = os.path.join('..','runs', ID)
+
 
 def cross(a, b):
     cut_point = random.randint(0, min(len(a), len(b)))
@@ -31,7 +33,7 @@ def mutate(gene):
 def evaluate(gene):
     mutation_dictionary = dict(zip(ACTIVE_SITE_AAS, gene))
     p = enz.protein('../data/4KEY.pdb',
-                    seq = BM3_DM, # my residue numbering system
+                    seq = BM3_WT, # my residue numbering system
                     cofactors = ['HEM']) # keep the heme
 
     for pos in mutation_dictionary:
@@ -39,20 +41,24 @@ def evaluate(gene):
         p.mutate(pos, aa)
     p.refold()
 
-    docking_results = p.dock('CCS(=O)(=O)C1=C(N2C=CC=CC2=N1)S(=O)(=O)NC(=O)NC3=NC(=CC(=N3)OC)OC',
-                             target_residues = ACTIVE_SITE_AAS,
-                             exhaustiveness = 1)
-    docking_results.save(os.path.join(savedir, gene))
-    return score(p, docking_results) 
+    docking_results = p.dock('CS(=O)(=O)C1=CC(=C(C=C1)C(=O)C2C(=O)CCCC2=O)[N+](=O)[O-]', 
+                             target_residues = DOCKING_SITE,
+                             exhaustiveness = 16)
+    docking_results.save(os.path.join(OUTPATH, gene))
+    return score_mesotrione(p, docking_results) 
 
-def evaluate_batch(pop):
-    with multiprocessing.Pool(len(pop)) as pool:
+def evaluate_batch(pop, processes):
+    with multiprocessing.Pool(processes = processes) as pool:
         results = pool.map(evaluate, pop)
     pool.join()
     return results
 
-def select_parralel(pop, parralel_fn, frac = 0.1):
-    scores_dict = dict(zip(pop, parralel_fn(pop)))
+def select_parralel(pop, parralel_fn, processes = 4, frac = 0.1):
+    scores_dict = dict(zip(pop, parralel_fn(pop, processes)))
+    df = pd.Series(scores_dict).reset_index()
+    df.columns=['gene','score']
+    print(df)
+    df.to_csv(os.path.join(OUTPATH, 'scores.csv'), mode = 'a', header = False)
     return  heapq.nsmallest(round(len(pop) * frac), 
                            scores_dict.keys(), 
                            key = lambda i : scores_dict[i]) 
@@ -63,19 +69,21 @@ def main(args):
         global ID 
         ID = args.id
 
-    os.mkdir(ID)
+    os.mkdir(OUTPATH)
+    pd.DataFrame([], columns=['gene','score']).to_csv(os.path.join(OUTPATH, 'scores.csv'))
     
     pop = [mutate('TYLFVLLIA') for i in range(pop_size)]
     for i in tqdm(range(args.nrounds)):
-        pop = select_parralel(pop, evaluate_batch, frac = 0.25)
+        pop = select_parralel(pop, evaluate_batch, processes = args.cpus, frac = 0.25)
         pop = [cross(*random.choices(pop, k = 2)) for i in range(pop_size)]
         pop = [mutate(i) for i in pop]
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--nrounds', default = 3)
-    parser.add_argument('-p', '--popsize', default = 8)
+    parser.add_argument('-n', '--nrounds', default = 3, type = int)
+    parser.add_argument('-p', '--popsize', default = 8, type = int)
     parser.add_argument('-i','--id')
+    parser.add_argument('-c','--cpus', default = 4, type = int)
     args = parser.parse_args()
     main(args)
