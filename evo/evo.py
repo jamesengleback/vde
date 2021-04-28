@@ -1,5 +1,3 @@
-# todo - save structures
-
 import pandas as pd
 import enz
 import os
@@ -16,7 +14,8 @@ from score import score_mesotrione
 
 ID = ''.join(random.choices(ascii_lowercase, k=5))
 OUTPATH = os.path.join('..','runs', ID)
-
+WT = ''.join([BM3_WT[i] for i in ACTIVE_SITE_AAS])
+K = 0.5 # hamming dist correction term
 
 def cross(a, b):
     cut_point = random.randint(0, min(len(a), len(b)))
@@ -29,6 +28,9 @@ def mutate(gene):
     pos = random.randint(0, len(gene) - 1)
     gene[pos] = random.choice('ACDEFGHIKLMNPQRSTVWY')
     return ''.join(gene)
+
+def hamming(a,b):
+    return sum([1 for i,j in zip(a,b) if i != j])
 
 def evaluate(gene):
     mutation_dictionary = dict(zip(ACTIVE_SITE_AAS, gene))
@@ -43,9 +45,12 @@ def evaluate(gene):
 
     docking_results = p.dock('CS(=O)(=O)C1=CC(=C(C=C1)C(=O)C2C(=O)CCCC2=O)[N+](=O)[O-]', 
                              target_residues = DOCKING_SITE,
-                             exhaustiveness = 16)
+                             exhaustiveness = 1)
     docking_results.save(os.path.join(OUTPATH, gene))
-    return score_mesotrione(p, docking_results) 
+    score_m, dist_mean, aff_mean = score_mesotrione(p, docking_results)  # todo return dist, aff, score
+    ham = hamming(WT, gene)
+    score = score_m / ham 
+    return {'score':score, 'dist_mean':dist_mean, 'aff_mean':aff_mean}
 
 def evaluate_batch(pop, processes):
     with multiprocessing.Pool(processes = processes) as pool:
@@ -55,13 +60,14 @@ def evaluate_batch(pop, processes):
 
 def select_parralel(pop, parralel_fn, processes = 4, frac = 0.1):
     scores_dict = dict(zip(pop, parralel_fn(pop, processes)))
-    df = pd.Series(scores_dict).reset_index()
-    df.columns=['gene','score']
+    df = pd.DataFrame(scores_dict).reset_index(drop=True).T
+    df.columns=['score','dist_mean','aff_mean']
     print(df)
+    print(scores_dict)
     df.to_csv(os.path.join(OUTPATH, 'scores.csv'), mode = 'a', header = False)
     return  heapq.nsmallest(round(len(pop) * frac), 
                            scores_dict.keys(), 
-                           key = lambda i : scores_dict[i]) 
+                           key = lambda i : scores_dict[i]['score']) 
 
 def main(args):
     pop_size = args.popsize
@@ -72,7 +78,7 @@ def main(args):
     os.mkdir(OUTPATH)
     pd.DataFrame([], columns=['gene','score']).to_csv(os.path.join(OUTPATH, 'scores.csv'))
     
-    pop = [mutate('TYLFVLLIA') for i in range(pop_size)]
+    pop = [mutate(WT) for i in range(pop_size)]
     for i in tqdm(range(args.nrounds)):
         pop = select_parralel(pop, evaluate_batch, processes = args.cpus, frac = 0.25)
         pop = [cross(*random.choices(pop, k = 2)) for i in range(pop_size)]
