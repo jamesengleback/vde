@@ -45,7 +45,7 @@ def evaluate(gene):
 
     docking_results = p.dock('CS(=O)(=O)C1=CC(=C(C=C1)C(=O)C2C(=O)CCCC2=O)[N+](=O)[O-]', 
                              target_residues = DOCKING_SITE,
-                             exhaustiveness = 1)
+                             exhaustiveness = 16)
     docking_results.save(os.path.join(OUTPATH, gene))
     score_m, dist_mean, aff_mean = score_mesotrione(p, docking_results)  # todo return dist, aff, score
     ham = hamming(WT, gene)
@@ -76,7 +76,7 @@ def main(args):
         ID = args.id
 
     os.mkdir(OUTPATH)
-    pd.DataFrame([], columns=['gene','score']).to_csv(os.path.join(OUTPATH, 'scores.csv'))
+    pd.DataFrame([], columns=['score','dist_mean','aff_mean']).to_csv(os.path.join(OUTPATH, 'scores.csv'))
     
     pop = [mutate(WT) for i in range(pop_size)]
     for i in tqdm(range(args.nrounds)):
