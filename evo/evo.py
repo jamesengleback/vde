@@ -18,7 +18,8 @@ import ga
 from bm3 import BM3_WT, MXN_SITES, DOCKING_SITE
 from score import score_mesotrione 
 
-OUTDIR = osp.join('runs',''.join(random.choices(ascii_lowercase, k=5)))
+RUN_ID = ''.join(random.choices(ascii_lowercase, k=5))
+OUTDIR = osp.join('runs','newscore',RUN_ID)
 WT = ''.join([BM3_WT[i] for i in MXN_SITES])
 K = 0.5 # hamming dist correction term
 
@@ -32,7 +33,8 @@ def evaluate(gene,
     mutation_dictionary = dict(zip(MXN_SITES, gene))
     p = enz.protein('../data/4KEY.pdb',
                     seq = BM3_WT, # my residue numbering system
-                    keep = ['HEM']) # keep the heme
+                    keep = ['HEM'],
+                    tmp_suffix=RUN_ID) # keep the heme
     for pos, aa in zip(mutation_dictionary.keys(), 
                        mutation_dictionary.values()):
         p.mutate(pos, aa)
@@ -43,7 +45,7 @@ def evaluate(gene,
     docking_results.save(osp.join(out_dir, gene))
     score_m, dist_mean, aff_mean = score_mesotrione(p, docking_results)  # todo return dist, aff, score
     ham = hamming(WT, gene)
-    score = score_m * log(1 + ham)
+    score = score_m + (0.1 * log(1 + ham))
     return {'gene':gene, 'score':score, 'dist_mean':dist_mean, 'aff_mean':aff_mean, 'ham':ham}
 
 
@@ -63,7 +65,7 @@ def gc():
     # garbage collection
     # can clash with other enz runs!
     files = [os.path.join('/tmp',i) for i in os.listdir('/tmp')]
-    enz_files = [i for i in files if i[-4:] == '_enz']
+    enz_files = [i for i in files if f'{RUN_ID}_enz' in i]
     for i in enz_files:
         if os.path.isfile(i):
             os.remove(i)

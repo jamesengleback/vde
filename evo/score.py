@@ -13,7 +13,7 @@ def score_mesotrione(p, r):
     affinities = np.array([pose_dict[i]['affinity'] for i in pose_dict]).astype(float)
     distances = np.array([c20_fe_distance(p, pose_dict[i]['mol']) for i in pose_dict])
 
-    return sum(np.log(distances) * np.log(affinities)), distances.mean(), affinities.mean()
+    return np.mean(np.log(distances) + 0.1*np.log(abs(affinities))), distances.mean(), affinities.mean()
 
 
 def test():
