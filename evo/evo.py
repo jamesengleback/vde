@@ -45,7 +45,9 @@ def evaluate(gene,
     docking_results.save(osp.join(out_dir, gene))
     score_m, dist_mean, aff_mean = score_mesotrione(p, docking_results)  # todo return dist, aff, score
     ham = hamming(WT, gene)
-    score = score_m + (0.1 * log(1 + ham))
+    # score = score_m + (0.1 * log(1 + ham))
+    # 20211108 - more stringent hamming score
+    score = score_m + (0.1 * log(1 + ham) ** 2)
     return {'gene':gene, 'score':score, 'dist_mean':dist_mean, 'aff_mean':aff_mean, 'ham':ham}
 
 
