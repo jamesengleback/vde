@@ -117,13 +117,13 @@ def test(model,
         yh = model(v_i)
         a_h, d_h, s_h = yh[0], yh[1], yh[2]
 
-        aff.append(a_i)
-        dist.append(a_i)
-        score.append(a_i)
+        aff.append(a_i.cpu())
+        dist.append(d_i.cpu())
+        score.append(s_i.cpu())
 
-        aff_h.append(a_h)
-        dist_h.append(d_h)
-        score_h.append(s_h)
+        aff_h.append(a_h.cpu())
+        dist_h.append(d_h.cpu())
+        score_h.append(s_h.cpu())
 
     aff, dist, score, aff_h, dist_h, score_h = map(lambda l : cat(l), [aff, dist, score, aff_h, dist_h, score_h])
     loss_fn = nn.MSELoss()
