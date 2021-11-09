@@ -43,27 +43,27 @@ def train(model,
     if tensorboard:
             writer = SummaryWriter(osp.join(out_path,'tensorboard'), flush_secs=1)
     if cuda:
-        model.cuda()
-
+        model = model.cuda()
     # train loop
     # --- 
     loss_fn = nn.MSELoss()
     opt = torch.optim.Adam(model.parameters(), lr=learning_rate)
     for epoch in range(epochs):
         with tqdm(data_loader) as data_loader_:
+            model.train()
             for i, batch in enumerate(data_loader_):
-                if cuda:
-                    map(lambda t : t.cuda(), batch)                
-                # ---
                 v, a, d, s = batch # voxels, affinity, distance, score
-                v_ = random_rotate(v)
-                y_h = model(v_)
+                if cuda:
+                    v, a, d, s = v.cuda(), a.cuda(), d.cuda(), s.cuda()
+                # ---
+                #v_ = random_rotate(v)
+                y_h = model(v)
                 a_h, d_h, s_h = y_h[0], y_h[1], y_h[2]
                 loss_a = loss_fn(a, a_h)
                 loss_d = loss_fn(d, d_h)
                 loss_s = loss_fn(s, s_h)
                 # ---
-                loss = sum([loss_a, loss_d, loss_s])
+                loss = loss_a + loss_d + loss_s
                 loss.backward()
                 opt.step()
                 opt.zero_grad()
@@ -77,10 +77,11 @@ def train(model,
                 if tensorboard:
                     global_step = i + (len(data_loader) * epoch)
                     writer.add_scalars(main_tag='run',
-                            tag_scalar_dict={"loss_a":loss_a,
-                                             "loss_d":loss_d,
-                                             "loss_s":loss_s,
-                                             "loss":loss},
+                            tag_scalar_dict={"loss_a":loss_a.detach().cpu(),
+                                             "loss_d":loss_d.detach().cpu(),
+                                             "loss_s":loss_s.detach().cpu(),
+                                             "loss":loss.detach().cpu(),
+                                             },
                             global_step=global_step)
 
                     writer.flush()
@@ -90,7 +91,8 @@ def train(model,
                 metrics = test(model, 
                                test_loader,
                                plot=True,
-                               plot_path=osp.join(out_path, f'model_epoch_{epoch}.png')
+                               plot_path=osp.join(out_path, f'model_epoch_{epoch}.png'),
+                               cuda=args.cuda,
                                )
                 with open(osp.join(out_path, 'checkpoints', 'checkpoints.txt'), 'a') as f:
                     f.write(f'model_epoch_{epoch}.pt : {metrics}')
@@ -106,20 +108,22 @@ def test(model,
     aff_h, dist_h, score_h = [], [], []
     if cuda:
         model = model.cuda()
-    with torch.no_grad():
-        for v_i, a_i, d_i, s_i in tqdm(data_loader):
-            if cuda:
-                map(lambda t : t.cuda(), [v_i, a_i, d_i, s_i])
-            yh = model(v_i)
-            a_h, d_h, s_h = yh[0], yh[1], yh[2]
+    #with torch.no_grad():
+    model.eval()
+    for v_i, a_i, d_i, s_i in tqdm(data_loader):
+        if cuda:
+            v_i, a_i, d_i, s_i = v_i.cuda(), a_i.cuda(), d_i.cuda(), s_i.cuda()
 
-            aff.append(a_i)
-            dist.append(a_i)
-            score.append(a_i)
+        yh = model(v_i)
+        a_h, d_h, s_h = yh[0], yh[1], yh[2]
 
-            aff_h.append(a_h)
-            dist_h.append(d_h)
-            score_h.append(s_h)
+        aff.append(a_i)
+        dist.append(a_i)
+        score.append(a_i)
+
+        aff_h.append(a_h)
+        dist_h.append(d_h)
+        score_h.append(s_h)
 
     aff, dist, score, aff_h, dist_h, score_h = map(lambda l : cat(l), [aff, dist, score, aff_h, dist_h, score_h])
     loss_fn = nn.MSELoss()
@@ -131,8 +135,8 @@ def test(model,
     if plot:
         plot_scatter(*zip(\
                 ['aff', 'dist', 'score'],
-                [aff, dist, score],
-                [aff_h, dist_h, score_h]),
+                [aff.detach().cpu(), dist.detach().cpu(), score.detach().cpu()],
+                [aff_h.detach().cpu(), dist_h.detach().cpu(), score_h.detach().cpu()]),
                 plot_path=plot_path)
     return metrics
 
@@ -180,7 +184,7 @@ def main(args):
     train_data, test_data = random_split(data, (train_size, test_size))
     train_loader = DataLoader(train_data,
                               batch_size = args.batch_size,
-                              shuffle = True,
+                              shuffle=True,
                               num_workers=1)
     test_loader = DataLoader(test_data,
                              batch_size=64,
@@ -192,6 +196,8 @@ def main(args):
                   n_downsamples=args.downsamples,
                   n_recycles=args.recycles,
                   ) # init from shape
+    if args.cuda:
+        model = model.cuda()
     # ---
     train(model, 
           train_loader, 
@@ -206,9 +212,10 @@ def main(args):
 
     metrics = test(model, 
                    test_loader,
-                   plot=False)
+                   plot=True,
+                   cuda=args.cuda)
 
-    sys.stdout.write(json.dumps(metrics))
+    sys.stdout.write(json.dumps({**args.__dict__, **metrics}))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -42,6 +42,8 @@ def main(num):
                             + f" -r {params['recyles']}"\
                             + f" -s"\
                             + f" -l"\
+                            + f" -c"\
+                            #+ f" -x"\
                             #+ f" 2>/dev/null"\
                             )
         try:

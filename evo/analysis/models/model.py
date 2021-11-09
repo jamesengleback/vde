@@ -33,16 +33,15 @@ class ResConv3d(nn.Module):
     def forward(self, x):
         return self.bn1(x + relu(self.c1(x)))
 
-class PredictionHeads(nn.Module):
-    def __init__(self, dim, n):
+class PredictionHead(nn.Module):
+    def __init__(self, dim):
         super().__init__()
-        self.heads = {i:nn.Sequential(\
+        self.head = nn.Sequential(\
                             nn.Linear(dim,1),
                             nn.Dropout(0.2),
-                            nn.ReLU())\
-                                    for i in range(n)}
+                            nn.ReLU())
     def forward(self,x):
-        return {i:self.heads[i](x) for i in self.heads}
+        return self.head(x)
 
 
 class Model(nn.Module):
@@ -79,7 +78,7 @@ class Model(nn.Module):
         downscale_size = self._get_downscaled_size()
         self.lin1 = nn.Sequential(nn.Linear(downscale_size, dim), nn.ReLU(), nn.Dropout(0.2))
         self.lin2 = nn.Sequential(nn.Linear(dim,dim),nn.ReLU(), nn.Dropout(0.2))
-        self.pred_heads = PredictionHeads(dim, 3)
+        self.pred_heads = nn.ModuleList([PredictionHead(dim) for i in range(n_pred_heads)])
 
     def forward(self, x):
         x_i = relu(self.c1(x))
@@ -90,7 +89,7 @@ class Model(nn.Module):
         x_i = self.lin1(x_i) 
         for _ in range(self.hyper_params['n_recycles']):
             x_i = self.lin2(x_i)
-        return self.pred_heads(x_i)
+        return [head(x_i) for head in self.pred_heads]
 
     def _get_downscaled_size(self):
         x_ = zeros(*[self.hyper_params[i] for i in ['ft_shape','x_shape','y_shape','z_shape']])
