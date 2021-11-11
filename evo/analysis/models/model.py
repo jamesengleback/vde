@@ -39,7 +39,7 @@ class PredictionHead(nn.Module):
         self.head = nn.Sequential(\
                             nn.Linear(dim,1),
                             nn.Dropout(0.2),
-                            nn.ReLU())
+                            nn.LeakyReLU())
     def forward(self,x):
         return self.head(x)
 
@@ -73,11 +73,11 @@ class Model(nn.Module):
                             out_channels=dim,
                             kernel_size=(3,3,3),
                             stride=1),
-                  nn.ReLU()])
+                  nn.LeakyReLU()])
         #downscale_size = 864
         downscale_size = self._get_downscaled_size()
-        self.lin1 = nn.Sequential(nn.Linear(downscale_size, dim), nn.ReLU(), nn.Dropout(0.2))
-        self.lin2 = nn.Sequential(nn.Linear(dim,dim),nn.ReLU(), nn.Dropout(0.2))
+        self.lin1 = nn.Sequential(nn.Linear(downscale_size, dim), nn.LeakyReLU(), nn.Dropout(0.2))
+        self.lin2 = nn.Sequential(nn.Linear(dim,dim),nn.LeakyReLU(), nn.Dropout(0.2))
         self.pred_heads = nn.ModuleList([PredictionHead(dim) for i in range(n_pred_heads)])
 
     def forward(self, x):
