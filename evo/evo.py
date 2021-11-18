@@ -15,12 +15,12 @@ import argparse
 import enz
 import ga
 
-from bm3 import BM3_WT, MXN_SITES, DOCKING_SITE
+from bm3 import BM3_DM, MXN_SITES, DOCKING_SITE
 from score import score_mesotrione 
 
 RUN_ID = ''.join(random.choices(ascii_lowercase, k=5))
-OUTDIR = osp.join('runs','newscore',RUN_ID)
-WT = ''.join([BM3_WT[i] for i in MXN_SITES])
+OUTDIR = osp.join('runs','newscore', 'dm',RUN_ID)
+WT = ''.join([BM3_DM[i] for i in MXN_SITES])
 K = 0.5 # hamming dist correction term
 
 
@@ -32,7 +32,7 @@ def evaluate(gene,
              out_dir=OUTDIR):
     mutation_dictionary = dict(zip(MXN_SITES, gene))
     p = enz.protein('../data/4KEY.pdb',
-                    seq = BM3_WT, # my residue numbering system
+                    seq = BM3_DM, # my residue numbering system
                     keep = ['HEM'],
                     tmp_suffix=RUN_ID) # keep the heme
     for pos, aa in zip(mutation_dictionary.keys(), 
@@ -81,7 +81,7 @@ def main(args):
     SURVIVAL = args.survival
     os.makedirs(OUTDIR)
     SCORES_CSV = osp.join(OUTDIR,'scores.csv')
-    WT = ''.join([BM3_WT[i] for i in MXN_SITES])
+    WT = ''.join([BM3_DM[i] for i in MXN_SITES])
     VOCAB='ACDEFGHIKLMNPQRSTVWY'
     EXHAUSTIVENESS = args.exhaustiveness
     # write run config
@@ -108,7 +108,6 @@ def main(args):
     pop = [ga.mutate(WT) for i in range(POP_SIZE)]
     for i in tqdm(range(N_GENERATIONS)):
         scores = ga.eval(pop, helper)
-        print(scores)
 
         pd.DataFrame(scores).T.to_csv(osp.join(OUTDIR, 'scores.csv'), header=False, index=False, mode='a')
 
