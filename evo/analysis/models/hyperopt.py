@@ -11,9 +11,9 @@ import pandas as pd
 @dataclass
 class ParamSpace:
     epochs = [5,10,20,50]
-    batch_size = [8, 16, 32]
+    batch_size = [16, 32, 64]
     learning_rate = [1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8]
-    dim = [2**i for i in range(3,8)]
+    dim = [2**i for i in range(4,8)]
     downsamples = [2,4,6,8]
     recyles = [2,4,6,8]
 
@@ -42,6 +42,8 @@ def main(num):
                             + f" -r {params['recyles']}"\
                             + f" -s"\
                             + f" -l"\
+                            + f" -c"\
+                            #+ f" -x"\
                             #+ f" 2>/dev/null"\
                             )
         try:
