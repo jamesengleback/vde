@@ -1,5 +1,5 @@
-from math import log
-import pandas as pd
+#from math import log
+#import pandas as pd
 import os
 import os.path as osp
 import shutil
@@ -16,46 +16,97 @@ import enz
 import ga
 
 from bm3 import BM3_DM, MXN_SITES, DOCKING_SITE
-from score import score_mesotrione 
+from score import score_mesotrione, mean_dists_affs
 
-RUN_ID = ''.join(random.choices(ascii_lowercase, k=5))
-OUTDIR = osp.join('runs','newscore', 'dm',RUN_ID)
-WT = ''.join([BM3_DM[i] for i in MXN_SITES])
-K = 0.5 # hamming dist correction term
+def write_json(dictionary, path, mode='a'):
+    with open(path,mode) as f:
+        json.dump(dictionary,f)
 
+def write_self(path):
+    with open(__name__, 'r') as f:
+        code = f.read()
+    with open(path,'w') as f:
+        f.write(code)
 
 def hamming(a,b):
-    return sum([1 for i,j in zip(a,b) if i != j])
+    '''
+    Hamming distance between two strings
+    '''
+    return sum([i != j for i,j in zip(a,b)])
+
+def mutate_string(template, target_dict):
+    '''
+    mutates template string according to a dictionary {pos:aa, ... }
+    '''
+    s_ = list(template)
+    for i,j in zip(target_dict.keys(), target_dict.values()):
+        s_[i] = j
+    return ''.join(s_)
+
+def simulate(structure_template,
+             sequence,
+             ligand_smiles,
+             binding_site,
+             out_dir=None,
+             keep = None,
+             exhaustiveness=16,
+             tmp_suffix='run',
+             **kwargs
+             ):
+    '''
+    General function for simulating a mutant
+    returns enz.protein & enz.docking results
+    '''
+    p = enz.Protein(structure_template,
+                    seq=sequence, 
+                    keep=keep,
+                    tmp_suffix=tmp_suffix) 
+
+    p.refold()
+    docking_results = p.dock(ligand_smiles, 
+                             target_sites=binding_site,
+                             exhaustiveness=exhaustiveness)
+    if out_dir is not None:
+        docking_results.save(out_dir)
+    return p, docking_results
 
 def evaluate(gene,
+             template=None,
              exhaustiveness=16,
-             out_dir=OUTDIR):
-    mutation_dictionary = dict(zip(MXN_SITES, gene))
-    p = enz.protein('../data/4KEY.pdb',
-                    seq = BM3_DM, # my residue numbering system
-                    keep = ['HEM'],
-                    tmp_suffix=RUN_ID) # keep the heme
-    for pos, aa in zip(mutation_dictionary.keys(), 
-                       mutation_dictionary.values()):
-        p.mutate(pos, aa)
-    p.refold()
-    docking_results = p.dock('CS(=O)(=O)C1=CC(=C(C=C1)C(=O)C2C(=O)CCCC2=O)[N+](=O)[O-]', 
-                             target_sites = DOCKING_SITE,
-                             exhaustiveness = exhaustiveness)
-    docking_results.save(osp.join(out_dir, gene))
-    score_m, dist_mean, aff_mean = score_mesotrione(p, docking_results)  # todo return dist, aff, score
-    ham = hamming(WT, gene)
-    # score = score_m + (0.1 * log(1 + ham))
-    # 20211108 - more stringent hamming score
-    score = score_m + (0.1 * log(1 + ham) ** 2)
-    return {'gene':gene, 'score':score, 'dist_mean':dist_mean, 'aff_mean':aff_mean, 'ham':ham}
+             out_dir=None):
+    '''
+    mutant evaluation function specific to this project
+    '''
+    assert len(gene) == len(MXN_SITES)
+    out_dir = osp.join(out_dir,gene) if out_dir is not None else None
+    sequence = mutate_string(BM3_DM, dict(zip(MXN_SITES, gene)))
+    protein, docking_results = simulate(structure_template='4KEY.pdb',
+                                        sequence=sequence,
+                                        keep=['HEM'],
+                                        ligand_smiles='CS(=O)(=O)C1=CC(=C(C=C1)C(=O)C2C(=O)CCCC2=O)[N+](=O)[O-]',
+                                        binding_site=DOCKING_SITE,
+                                        out_dir=out_dir,
+                                        tmp_suffix='',
+                                        exhaustiveness=exhaustiveness)
+    dist_mean, aff_mean = mean_dists_affs(protein, docking_results)
+    score = sum([dist_mean, aff_mean])
+    if template is not None:
+        ham = hamming(template, gene)
+        score += ham
+    else:
+        ham=None
+    return {'gene':gene, 
+            'score':score, 
+            'dist_mean':dist_mean, 
+            'aff_mean':aff_mean, 
+            'ham':ham}
 
 
 def select_parralel(pop, 
                     parralel_fn, 
                     processes = 4, 
                     frac = 0.1,
-                    out_dir=OUTDIR):
+                    out_dir=None):
     scores_dict = dict(zip(pop, parralel_fn(pop, processes)))
     df = pd.DataFrame(scores_dict).reset_index(drop=True).T
     df.columns=['score','dist_mean','aff_mean']
@@ -63,11 +114,11 @@ def select_parralel(pop,
     return  heapq.nsmallest(round(len(pop) * frac), 
                            scores_dict.keys(), 
                            key = lambda i : scores_dict[i]['score']) 
-def gc():
+def gc(string_match):
     # garbage collection
     # can clash with other enz runs!
     files = [os.path.join('/tmp',i) for i in os.listdir('/tmp')]
-    enz_files = [i for i in files if f'{RUN_ID}_enz' in i]
+    enz_files = [i for i in files if f'{string_match}_enz' in i]
     for i in enz_files:
         if os.path.isfile(i):
             os.remove(i)
@@ -79,12 +130,15 @@ def main(args):
     POP_SIZE = args.pop_size
     N_GENERATIONS = args.n_generations
     SURVIVAL = args.survival
+    EXHAUSTIVENESS = args.exhaustiveness
+    # ---
+    RUN_ID = ''.join(random.choices(ascii_lowercase, k=5))
+    OUTDIR = osp.join(args.outdir,RUN_ID)
     os.makedirs(OUTDIR)
     SCORES_CSV = osp.join(OUTDIR,'scores.csv')
-    WT = ''.join([BM3_DM[i] for i in MXN_SITES])
+    TEMPLATE = ''.join([BM3_DM[i] for i in MXN_SITES])
+    # ---
     VOCAB='ACDEFGHIKLMNPQRSTVWY'
-    EXHAUSTIVENESS = args.exhaustiveness
-    # write run config
     CONFIG = {'POP_SIZE':POP_SIZE,
               'N_GENERATIONS':N_GENERATIONS,
               'SURVIVAL':SURVIVAL,
@@ -93,31 +147,29 @@ def main(args):
               'MXN_SITES':MXN_SITES,
               'OUTDIR':OUTDIR}
 
-    with open(osp.join(OUTDIR, 'config.json'),'w') as f:
-        json.dump(CONFIG,f)
+    config_path = osp.join(OUTDIR, 'config.json')
+    scores_path =osp.join(OUTDIR, 'scores.json') 
+    code_path =osp.join(OUTDIR, 'evo_used.py') 
 
+    write_json(CONFIG, config_path)
+    # ---
 
-    pd.DataFrame([], columns=['gene','score','dist_mean','aff_mean','ham'])\
-            .to_csv(osp.join(OUTDIR, 'scores.csv'),index=False)
-
-    helper = lambda gene : evaluate(gene, exhaustiveness=EXHAUSTIVENESS)
+    helper = lambda gene : evaluate(gene, 
+                                    exhaustiveness=EXHAUSTIVENESS,
+                                    out_dir=OUTDIR)
     select_best = lambda pop, frac : heapq.nsmallest(round(len(pop) * frac), 
-                                               scores_dict.keys(), 
-                                               key = lambda i : scores_dict[i]['score']) 
+                                                     pop.keys(), 
+                                                     key = lambda i : pop[i]['score']) 
     
-    pop = [ga.mutate(WT) for i in range(POP_SIZE)]
-    for i in tqdm(range(N_GENERATIONS)):
-        scores = ga.eval(pop, helper)
+    pop = [ga.random_mutate(TEMPLATE) for _ in range(POP_SIZE)] # init
 
-        pd.DataFrame(scores).T.to_csv(osp.join(OUTDIR, 'scores.csv'), header=False, index=False, mode='a')
-
-        best = heapq.nsmallest(round(SURVIVAL * POP_SIZE),
-                                   scores.keys(),
-                                   key = lambda i : scores[i]['score']) ## heapq lookup
-
+    for _ in tqdm(range(N_GENERATIONS)):
+        scores = ga.evaluate(pop, helper)
+        write_json(scores, scores_path, 'a')
+        best = select_best(scores, SURVIVAL)
         pop = [ga.crossover(*random.choices(pop, k = 2)) for i in range(POP_SIZE)]
-        pop = [ga.mutate(i) for i in pop]
-        gc()
+        pop = [ga.random_mutate(i) for i in pop]
+        gc(RUN_ID)
 
 
 if __name__ == '__main__':
@@ -126,5 +178,6 @@ if __name__ == '__main__':
     parser.add_argument('-n','--n_generations',type=int, default=5)
     parser.add_argument('-e','--exhaustiveness',type=int, default=16)
     parser.add_argument('-s','--survival',type=float, default=0.25)
+    parser.add_argument('-o','--outdir', default='runs')
     args = parser.parse_args()
     main(args)

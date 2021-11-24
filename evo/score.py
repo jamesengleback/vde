@@ -8,12 +8,18 @@ def c20_fe_distance(protein, vina_pose):
             ['x_coord', 'y_coord', 'z_coord']].values
     return np.linalg.norm(fe - c20)
 
-def score_mesotrione(p, r):
-    pose_dict = r.dictionary
-    affinities = np.array([pose_dict[i]['affinity'] for i in pose_dict]).astype(float)
-    distances = np.array([c20_fe_distance(p, pose_dict[i]['mol']) for i in pose_dict])
+def mean_dists_affs(protein, results):
+    '''
+    returns mean distance, mean affinity
+    '''
+    affinities = np.array([i['affinity'] for i in results]).astype(float)
+    distances = np.array([c20_fe_distance(protein, i['mol']) for i in results])
+    return distances.mean(), affinities.mean()
 
-    return np.mean(np.log(distances) + 0.1*np.log(abs(affinities))), distances.mean(), affinities.mean()
+def score_mesotrione(protein, results):
+    affinities = np.array([i['affinity'] for i in results]).astype(float)
+    distances = np.array([c20_fe_distance(protein, i['mol']) for i in results])
+    return np.mean(distances) + np.log(abs(affinities)), distances.mean(), affinities.mean()
 
 
 def test():
