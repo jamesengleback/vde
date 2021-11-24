@@ -1,1 +1,0 @@
-{"epochs": "1", "batch_size": "32", "learning_rate": "1e-05", "dim": "32", "downsamples": "2", "recycles": "6", "n_divisions": "16", "input": "../outputs/newscore2-98k.csv", "outdir": "None", "template_struc": "../../../data/4KEY.pdb", "cuda": "False", "tensorboard": "False", "checkpoint": "False", "test": "True", "quiet": "False"}
