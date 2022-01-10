@@ -20,7 +20,7 @@ def score_mesotrione(protein, results):
     #### dodgy
     affinities = np.array([i['affinity'] for i in results]).astype(float)
     distances = np.array([c20_fe_distance(protein, i['mol']) for i in results])
-    return np.mean(distances) + np.log(abs(affinities)), distances.mean(), affinities.mean()
+    return np.mean(distances) - np.log(abs(affinities)), distances.mean(), affinities.mean()
 
 
 def test():

@@ -49,28 +49,9 @@ def evaluate(gene,
             'aff_mean':aff_mean, 
             'ham':ham}
 
-class ConstrainedMutations:
-    def __init__(self, 
-                 fn, 
-                 layers=None, 
-                 thresh=4,
-                 ):
-        self.fn = fn
-        self.thresh = thresh
-        self.layers = ga.Sequential(
-                                    ga.RandomMutate(),
-                                    ga.CrossOver(),
-                                    )
-    def __call__(self, pop):
-        x = self.layers(pop)
-        while (a:=max(map(self.fn, x))) >= self.thresh:
-            print('\033[0;36m constrained')
-            x = self.layers(x)
-        return x
-    def __repr__(self):
-        return 'ConstrainedMutations'
 
 def main(args):
+    # --- config stuff ---
     POP_SIZE = args.pop_size
     N_GENERATIONS = args.n_generations
     SURVIVAL = args.survival
@@ -98,17 +79,13 @@ def main(args):
     evo.write_json(CONFIG, config_path)
     # ---
 
-    helper = lambda gene : evaluate(gene, 
-                                    exhaustiveness=EXHAUSTIVENESS,
-                                    out_dir=OUTDIR)
-    def helper(gene, **kwargs):
+    def helper(gene):
         # crashes still happen sometimes :(
         try:
             output = evaluate(gene, 
                               exhaustiveness=EXHAUSTIVENESS,
                               template=TEMPLATE,
-                              out_dir=OUTDIR,
-                              **kwargs)
+                              out_dir=OUTDIR)
             uid = ''.join(random.choices(ascii_lowercase, k=5))
             evo.write_json({uid:output}, scores_path)
             print('\033[0;36m written')
@@ -120,7 +97,7 @@ def main(args):
     pop = [ga.random_mutate(TEMPLATE) for _ in range(POP_SIZE)] # init
     mxn_layers = ga.Sequential(
                                ga.RandomMutate(),
-                               #ga.CrossOver(),
+                               ga.CrossOver(),
                                )
     fn = lambda x : ga.hamming(TEMPLATE,x)
     constrained_mxn_layers = ga.Constrained(
@@ -131,11 +108,12 @@ def main(args):
 
     pipeline = ga.Sequential(
                              ga.Evaluate(helper, max_workers=POP_SIZE),
-                             ga.Tournament(gt=False),
+                             #ga.Tournament(gt=False),
+                             ga.PickBottom(),
                              ga.Print(),
                              ga.Clone(n=POP_SIZE),
                              ga.Print(),
-                             #constrained_mxn_layers,
+                             constrained_mxn_layers,
                              #ga.Print(),
                             )
 
