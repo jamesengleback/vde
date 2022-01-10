@@ -1,15 +1,8 @@
-#from math import log
-#import pandas as pd
 import os
 import os.path as osp
-import shutil
-import json
 import random
 from string import ascii_lowercase
-import heapq
-from multiprocessing.pool import ThreadPool
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-import numpy as np
+import json
 from tqdm import tqdm
 import argparse
 
@@ -28,6 +21,7 @@ def evaluate(gene,
     '''
     mutant evaluation function specific to this project
     '''
+    #print(f'\033[0;36m {gene}')
     assert len(gene) == len(MXN_SITES)
     out_dir = osp.join(out_dir,gene) if out_dir is not None else None
     sequence = evo.mutate_string(BM3_DM, dict(zip(MXN_SITES, gene))) # mutates string by dictionary of pos:aa
@@ -39,21 +33,42 @@ def evaluate(gene,
                                             out_dir=out_dir,
                                             tmp_suffix='',
                                             exhaustiveness=exhaustiveness)
+    #print('\033[0;36m docked')
     dist_mean, aff_mean = mean_dists_affs(protein, docking_results)
+    #print('\033[0;36m distances')
     score = sum([dist_mean, aff_mean])
     if template is not None:
-        ham = hamming(template, gene)
+        ham = evo.hamming(template, gene)
         score += ham
     else:
         ham=None
+    #print('\033[0;36m ham')
     return {'gene':gene, 
             'score':score, 
             'dist_mean':dist_mean, 
             'aff_mean':aff_mean, 
             'ham':ham}
 
-
-
+class ConstrainedMutations:
+    def __init__(self, 
+                 fn, 
+                 layers=None, 
+                 thresh=4,
+                 ):
+        self.fn = fn
+        self.thresh = thresh
+        self.layers = ga.Sequential(
+                                    ga.RandomMutate(),
+                                    ga.CrossOver(),
+                                    )
+    def __call__(self, pop):
+        x = self.layers(pop)
+        while (a:=max(map(self.fn, x))) >= self.thresh:
+            print('\033[0;36m constrained')
+            x = self.layers(x)
+        return x
+    def __repr__(self):
+        return 'ConstrainedMutations'
 
 def main(args):
     POP_SIZE = args.pop_size
@@ -87,28 +102,50 @@ def main(args):
                                     exhaustiveness=EXHAUSTIVENESS,
                                     out_dir=OUTDIR)
     def helper(gene, **kwargs):
+        # crashes still happen sometimes :(
         try:
             output = evaluate(gene, 
                               exhaustiveness=EXHAUSTIVENESS,
+                              template=TEMPLATE,
                               out_dir=OUTDIR,
                               **kwargs)
-            evo.write_json(output, scores_path)
+            uid = ''.join(random.choices(ascii_lowercase, k=5))
+            evo.write_json({uid:output}, scores_path)
+            print('\033[0;36m written')
             return output['score']
-        except:
+        except Exception as e:
+            print('\033[0;36m' + e)
             return 100
 
     pop = [ga.random_mutate(TEMPLATE) for _ in range(POP_SIZE)] # init
+    mxn_layers = ga.Sequential(
+                               ga.RandomMutate(),
+                               #ga.CrossOver(),
+                               )
+    fn = lambda x : ga.hamming(TEMPLATE,x)
+    constrained_mxn_layers = ga.Constrained(
+                                    fn=fn,
+                                    layers=mxn_layers,
+                                    thresh=lambda p : max(map(fn,p)) <=4,
+                                    )
 
     pipeline = ga.Sequential(
                              ga.Evaluate(helper, max_workers=POP_SIZE),
                              ga.Tournament(gt=False),
-                             ga.CrossOver(POP_SIZE),
-                             ga.RandomMutate(),
+                             ga.Print(),
+                             ga.Clone(n=POP_SIZE),
+                             ga.Print(),
+                             #constrained_mxn_layers,
+                             #ga.Print(),
                             )
+
     for _ in tqdm(range(N_GENERATIONS)):
+        print(f'\033[0;36m n mutants: {len(pop)}')
+        print(f'\033[0;36m {pipeline.log}')
         pop = pipeline(pop)
         evo.gc(RUN_ID)
-
+        print(f'\033[0;36m n mutants: {len(pop)}')
+        print(f'\033[0;36m end of iteration {_}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

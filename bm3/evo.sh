@@ -5,4 +5,4 @@ conda activate enz
 #        python evo.py -p 64 -e 4 -n 100 -s 0.25 1> /dev/null &
 #done
 #seq 32 | parallel echo {} ; python evo.py -p 64 -e 8 -n 100 -s 0.25 1> /dev/null 
-python main.py -p 8 -e 1 -n 4 -s 0.25 #1> /dev/null
+python main.py -p 4 -e 1 -n 8
