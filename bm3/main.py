@@ -105,31 +105,32 @@ def main(args):
                                     layers=mxn_layers,
                                     thresh=lambda p : max(map(fn,p)) <=4,
                                     )
+    #helper = lambda mutant : sum([i == 'A' for i in mutant])
 
     pipeline = ga.Sequential(
                              ga.Evaluate(helper, max_workers=POP_SIZE),
-                             #ga.Tournament(gt=False),
                              ga.PickBottom(),
-                             ga.Print(),
-                             ga.Clone(n=POP_SIZE),
-                             ga.Print(),
+                             ga.Clone(POP_SIZE),
                              constrained_mxn_layers,
-                             #ga.Print(),
                             )
 
+    print(len(pop))
     for _ in tqdm(range(N_GENERATIONS)):
-        print(f'\033[0;36m n mutants: {len(pop)}')
-        print(f'\033[0;36m {pipeline.log}')
         pop = pipeline(pop)
-        evo.gc(RUN_ID)
-        print(f'\033[0;36m n mutants: {len(pop)}')
-        print(f'\033[0;36m end of iteration {_}')
+        #evo.gc(RUN_ID)
+        print(len(pop))
+        print(pop)
+        #print(f'\033[0;36m n mutants: {len(pop)}')
+        #print(f'\033[0;36m {pipeline.log}')
+        #print(pop)
+        #print(f'\033[0;36m n mutants: {len(pop)}')
+        #print(f'\033[0;36m end of iteration {_}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p','--pop_size',type=int, default=10)
+    parser.add_argument('-p','--pop_size',type=int, default=8)
     parser.add_argument('-n','--n_generations',type=int, default=5)
-    parser.add_argument('-e','--exhaustiveness',type=int, default=16)
+    parser.add_argument('-e','--exhaustiveness',type=int, default=1)
     parser.add_argument('-s','--survival',type=float, default=0.25)
     parser.add_argument('-o','--outdir', default='runs')
     args = parser.parse_args()
