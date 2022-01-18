@@ -1,5 +1,3 @@
-#from math import log
-#import pandas as pd
 import os
 import os.path as osp
 import shutil
@@ -16,9 +14,17 @@ import enz
 import ga
 
 
-def write_json(dictionary, path, mode='a'):
-    with open(path,mode) as f:
-        json.dump(dictionary,f)
+def write_json(dictionary, path):
+    if osp.exists(path): # append
+        with open(path,'r+') as f:
+            data = json.load(f)
+            data.update(dictionary)
+            f.seek(0)
+            json.dump(data,f)
+    else: # write fresh
+        with open(path,'w') as f:
+            json.dump(dictionary,f)
+
 
 def write_self(path):
     with open(__name__, 'r') as f:
@@ -61,25 +67,28 @@ def simulate(structure_template,
                     tmp_suffix=tmp_suffix) 
 
     p.refold()
+    print('\033[0;36m evo.simulate - refolded')
     docking_results = p.dock(ligand_smiles, 
                              target_sites=binding_site,
                              exhaustiveness=exhaustiveness)
+    print('\033[0;36m evo.simulate - docked')
     if out_dir is not None:
         docking_results.save(out_dir)
     return p, docking_results
 
-def select_parralel(pop, 
-                    parralel_fn, 
-                    processes = 4, 
-                    frac = 0.1,
-                    out_dir=None):
-    scores_dict = dict(zip(pop, parralel_fn(pop, processes)))
-    df = pd.DataFrame(scores_dict).reset_index(drop=True).T
-    df.columns=['score','dist_mean','aff_mean']
-    df.to_csv(osp.join(out_dir, 'scores.csv'), mode = 'a', header = False)
-    return  heapq.nsmallest(round(len(pop) * frac), 
-                           scores_dict.keys(), 
-                           key = lambda i : scores_dict[i]['score']) 
+#def select_parralel(pop, 
+#                    parralel_fn, 
+#                    processes = 4, 
+#                    frac = 0.1,
+#                    out_dir=None):
+#    scores_dict = dict(zip(pop, parralel_fn(pop, processes)))
+#    df = pd.DataFrame(scores_dict).reset_index(drop=True).T
+#    df.columns=['score','dist_mean','aff_mean']
+#    df.to_csv(osp.join(out_dir, 'scores.csv'), mode = 'a', header = False)
+#    return  heapq.nsmallest(round(len(pop) * frac), 
+#                           scores_dict.keys(), 
+#                           key = lambda i : scores_dict[i]['score']) 
+
 def gc(string_match):
     # garbage collection
     # can clash with other enz runs!
