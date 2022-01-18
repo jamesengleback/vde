@@ -43,7 +43,6 @@ pip install linode-cli
 linode-cli obj get james-engleback PyRosetta4.MinSizeRel.python38.ubuntu.release-284.tar.bz2
 
 # --- pyrosetta ---
-cd ~
 tar xfvj PyRosetta4.MinSizeRel.python38.ubuntu.release-284.tar.bz2
 pip install ~/src/PyRosetta4.MinSizeRel.python38.ubuntu.release-284/setup
 
@@ -53,4 +52,7 @@ pip install ~/src/ga
 
 cd ~
 git clone https://github.com/jamesengleback/evo
+cd evo
+git fetch origin doesitwork
+git checkout doesitwork
 pip install ~/evo

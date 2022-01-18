@@ -4,7 +4,7 @@ U0_PASS=$1
 # dependencies: git, curl, bzip2, gcc
 apt update -y
 apt upgrade -y
-apt install git curl bzip2 gcc neovim tmux parallel -y
+apt install git curl bzip2 gcc neovim tmux htop  -y
 
 # --- user0 ---
 adduser u0 --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password

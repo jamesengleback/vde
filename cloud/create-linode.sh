@@ -7,7 +7,7 @@ U0_PASS=$(pass u0@evo)
 LABEL=evo
 
 linode-cli linodes create \
-	--type g6-standard-8 \
+	--type g6-dedicated-50 \
 	--region eu-west \
 	--label $LABEL \
 	--image linode/debian11 \
@@ -39,6 +39,12 @@ while $LOOP; do
 	fi
 done
 
+linode-cli linodes view $ID
+sshpass -p$ROOT_PASS scp -r config root@$IP:~
+sshpass -p$ROOT_PASS ssh root@$IP "~/config/setuproot.sh $U0_PASS"
+sshpass -p$U0_PASS  ssh u0@$IP '~/setupu0.sh'
+sshpass -p$ROOT_PASS ssh-copy-id root@$IP
+sshpass -p$U0_PASS ssh-copy-id u0@$IP
 #linode-cli linodes delete $ID
 
 echo "alias evo='ssh root@$IP'" >> ~/.bashrc
