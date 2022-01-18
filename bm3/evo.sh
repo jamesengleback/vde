@@ -1,12 +1,10 @@
 #!/bin/bash
-source ~/disk/src/miniconda3/etc/profile.d/conda.sh
+source ~/miniconda3/etc/profile.d/conda.sh
 conda activate enz
-#for _ in $(seq  2); do
-#        python main.py -p 64 -e 4 -n 10 -s 0.25 1> /dev/null &
-#done
-seq 8 | parallel echo {} ; python main.py -p 64 -e 8 -n 20 -s 0.25 1> /dev/null 
-#python main.py -p 16 -e 1 -n 8
+for _ in $(seq  8); do
+        python main.py -p 128 -e 4 -n 32 -s 0.25  &
+done
 tar cfz runs.tar.gz runs/
-conda deactivate
-linode-cli obj put runs.tar.gz james-engleback
+#conda deactivate
+#linode-cli obj put runs.tar.gz james-engleback
 

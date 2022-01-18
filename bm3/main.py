@@ -117,7 +117,7 @@ def main(args):
     print(len(pop))
     for _ in tqdm(range(N_GENERATIONS)):
         pop = pipeline(pop)
-        #evo.gc(RUN_ID)
+        evo.gc(RUN_ID)
         print(len(pop))
         print(pop)
         #print(f'\033[0;36m n mutants: {len(pop)}')
