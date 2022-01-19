@@ -12,7 +12,7 @@ import enz
 import ga
 
 from bm3 import BM3_DM, MXN_SITES, DOCKING_SITE
-from score import score_mesotrione, mean_dists_affs
+from score import score_a, score_b, mean_dists_affs
 
 def write_json(dictionary, path, mode='a'):
     with open(path,mode) as f:
@@ -44,6 +44,7 @@ def gc(string_match):
 
 def evaluate(gene,
              out_dir_root,
+             score_fn,
              template=None,
              exhaustiveness=16,
              run_id=None,
@@ -64,7 +65,7 @@ def evaluate(gene,
                                    target_sites=DOCKING_SITE,
                                    exhaustiveness=exhaustiveness)
     print('\033[0;36m docked')
-    dist_mean, aff_mean, score = score_mesotrione(protein, docking_results)
+    dist_mean, aff_mean, score = score_fn(protein, docking_results)
     print('\033[0;36m scored')
 
     out_dir = osp.join(out_dir_root,gene) # if out_dir_root is not None else None
@@ -88,6 +89,8 @@ def main(args):
     N_GENERATIONS = args.n_generations
     SURVIVAL = args.survival
     EXHAUSTIVENESS = args.exhaustiveness
+    SCOREFN = args.score_fn
+    assert SCOREFN in {'a','b'}
     # ---
     RUN_ID = ''.join(random.choices(ascii_lowercase, k=5))
     OUTDIR = osp.join(args.outdir,RUN_ID)
@@ -102,7 +105,8 @@ def main(args):
               'EXHAUSTIVENESS':EXHAUSTIVENESS,
               'VOCAB':VOCAB,
               'MXN_SITES':MXN_SITES,
-              'OUTDIR':OUTDIR}
+              'OUTDIR':OUTDIR, 
+              'SCOREFN':SCOREFN}
 
     config_path = osp.join(OUTDIR, 'config.json')
     scores_path =osp.join(OUTDIR, 'scores.json') 
@@ -111,12 +115,15 @@ def main(args):
     write_json(CONFIG, config_path)
     # ---
 
+    score_fn = {'a':score_a, 'b':score_b}[SCOREFN]
+
     def helper(gene):
         output = evaluate(gene, 
                           exhaustiveness=EXHAUSTIVENESS,
                           template=TEMPLATE,
                           out_dir_root=OUTDIR,
-                          run_id=RUN_ID)
+                          run_id=RUN_ID,
+                          score_fn=score_fn)
         print(f'\033[0;36m helper:evaluated')
         uid = ''.join(random.choices(ascii_lowercase, k=5))
         output['uid'] = uid
@@ -148,9 +155,7 @@ def main(args):
 
     for _ in tqdm(range(N_GENERATIONS)):
         pop = pipeline(pop)
-        evo.gc(RUN_ID)
-        print(len(pop))
-        print(pop)
+        #evo.gc(RUN_ID)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -159,5 +164,6 @@ if __name__ == '__main__':
     parser.add_argument('-e','--exhaustiveness',type=int, default=1)
     parser.add_argument('-s','--survival',type=float, default=0.25)
     parser.add_argument('-o','--outdir', default='runs')
+    parser.add_argument('-fn','--score_fn', default='a')
     args = parser.parse_args()
     main(args)
