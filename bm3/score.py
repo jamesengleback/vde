@@ -16,12 +16,21 @@ def mean_dists_affs(protein, results):
     distances = np.array([c20_fe_distance(protein, i['mol']) for i in results])
     return distances.mean(), affinities.mean()
 
-def score_mesotrione(protein, results):
+def score_a(protein, results):
     #### dodgy
     affinities = np.array([i['affinity'] for i in results]).astype(float)
     distances = np.array([c20_fe_distance(protein, i['mol']) for i in results])
-    return np.mean(distances) - np.log(abs(affinities)), distances.mean(), affinities.mean()
+    return np.mean(distances) - np.log(abs(affinities).mean()), \
+           distances.mean(), \
+           affinities.mean()
 
+def score_b(protein, results):
+    affinities = np.array([i['affinity'] for i in results]).astype(float)
+    distances = np.array([c20_fe_distance(protein, i['mol']) for i in results])
+    def softmax(arr):
+        e = np.exp(arr - max(arr))
+        return e / sum(e)
+    return np.mean(distances * softmax(abs(affinities)))
 
 def test():
     p = enz.protein('DM-Mesotrione/clean_receptor.pdb',
