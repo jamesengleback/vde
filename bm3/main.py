@@ -148,8 +148,9 @@ def main(args):
 
     for _ in tqdm(range(N_GENERATIONS)):
         pop = pipeline(pop)
-        #evo.gc(RUN_ID)
-        print(f'\033[0;36m {pop}')
+        evo.gc(RUN_ID)
+        print(len(pop))
+        print(pop)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
