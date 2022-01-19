@@ -5,49 +5,81 @@ from string import ascii_lowercase
 import json
 from tqdm import tqdm
 import argparse
+import shutil
+import pandas as pd
 
 import enz
 import ga
-import evo
 
 from bm3 import BM3_DM, MXN_SITES, DOCKING_SITE
 from score import score_mesotrione, mean_dists_affs
 
+def write_json(dictionary, path, mode='a'):
+    with open(path,mode) as f:
+        json.dump(dictionary,f)
+
+def write_csv(dictionary, path):
+    df = pd.DataFrame([dictionary])
+    if osp.exists(path):
+        df.to_csv(path, mode='a', index=False, header=False)
+    else:
+        df.to_csv(path, index=False)
+
+def mutate_string(template, target_dict):
+    s_ = list(template)
+    for i,j in zip(target_dict.keys(), target_dict.values()):
+        s_[i] = j
+    return ''.join(s_)
+
+def gc(string_match):
+    # garbage collection
+    # can clash with other enz runs!
+    files = [os.path.join('/tmp',i) for i in os.listdir('/tmp')]
+    enz_files = [i for i in files if f'{string_match}_enz' in i]
+    for i in enz_files:
+        if os.path.isfile(i):
+            os.remove(i)
+        elif os.path.isdir(i):
+            shutil.rmtree(i)
 
 def evaluate(gene,
+             out_dir_root,
              template=None,
              exhaustiveness=16,
-             out_dir=None):
-    '''
-    mutant evaluation function specific to this project
-    '''
-    #print(f'\033[0;36m {gene}')
+             run_id=None,
+             ):
     assert len(gene) == len(MXN_SITES)
-    out_dir = osp.join(out_dir,gene) if out_dir is not None else None
-    sequence = evo.mutate_string(BM3_DM, dict(zip(MXN_SITES, gene))) # mutates string by dictionary of pos:aa
-    protein, docking_results = evo.simulate(structure_template='4KEY.pdb',
-                                            sequence=sequence,
-                                            keep=['HEM'],
-                                            ligand_smiles='CS(=O)(=O)C1=CC(=C(C=C1)C(=O)C2C(=O)CCCC2=O)[N+](=O)[O-]',
-                                            binding_site=DOCKING_SITE,
-                                            out_dir=out_dir,
-                                            tmp_suffix='',
-                                            exhaustiveness=exhaustiveness)
-    #print('\033[0;36m docked')
-    dist_mean, aff_mean = mean_dists_affs(protein, docking_results)
-    #print('\033[0;36m distances')
-    score = sum([dist_mean, aff_mean])
-    if template is not None:
-        ham = evo.hamming(template, gene)
-        score += ham
-    else:
-        ham=None
-    #print('\033[0;36m ham')
+
+
+    sequence = mutate_string(BM3_DM, dict(zip(MXN_SITES, gene))) # mutates string by dictionary of pos:aa
+    protein = enz.Protein('4KEY.pdb',
+                          seq=sequence, 
+                          keep=['HEM'],
+                          tmp_suffix=run_id) 
+
+    protein.refold()
+    print('\033[0;36m refolded')
+
+    docking_results = protein.dock('CS(=O)(=O)C1=CC(=C(C=C1)C(=O)C2C(=O)CCCC2=O)[N+](=O)[O-]',
+                                   target_sites=DOCKING_SITE,
+                                   exhaustiveness=exhaustiveness)
+    print('\033[0;36m docked')
+    dist_mean, aff_mean, score = score_mesotrione(protein, docking_results)
+    print('\033[0;36m scored')
+
+    out_dir = osp.join(out_dir_root,gene) # if out_dir_root is not None else None
+    print(f'\033[0;36m outdir: {out_dir} - saving ...')
+    docking_results.save(out_dir)
+    print(f'\033[0;36m saved to {out_dir}')
+
+    ham = ga.hamming(template, gene)
+    score += ham
     return {'gene':gene, 
             'score':score, 
             'dist_mean':dist_mean, 
             'aff_mean':aff_mean, 
-            'ham':ham}
+            'ham':ham,
+            }
 
 
 def main(args):
@@ -76,25 +108,23 @@ def main(args):
     scores_path =osp.join(OUTDIR, 'scores.json') 
     code_path =osp.join(OUTDIR, 'evo_used.py') 
 
-    evo.write_json(CONFIG, config_path)
+    write_json(CONFIG, config_path)
     # ---
 
     def helper(gene):
-        # crashes still happen sometimes :(
-        try:
-            output = evaluate(gene, 
-                              exhaustiveness=EXHAUSTIVENESS,
-                              template=TEMPLATE,
-                              out_dir=OUTDIR)
-            uid = ''.join(random.choices(ascii_lowercase, k=5))
-            evo.write_json({uid:output}, scores_path)
-            print('\033[0;36m written')
-            return output['score']
-        except Exception as e:
-            print('\033[0;36m' + e)
-            return 100
+        output = evaluate(gene, 
+                          exhaustiveness=EXHAUSTIVENESS,
+                          template=TEMPLATE,
+                          out_dir_root=OUTDIR,
+                          run_id=RUN_ID)
+        print(f'\033[0;36m helper:evaluated')
+        uid = ''.join(random.choices(ascii_lowercase, k=5))
+        output['uid'] = uid
+        scores_path = osp.join(OUTDIR, 'scores.csv')
+        write_csv(output, scores_path)
+        print(f'\033[0;36m written scores')
+        return output['score']
 
-    pop = [ga.random_mutate(TEMPLATE) for _ in range(POP_SIZE)] # init
     mxn_layers = ga.Sequential(
                                ga.RandomMutate(),
                                ga.CrossOver(),
@@ -102,29 +132,24 @@ def main(args):
     fn = lambda x : ga.hamming(TEMPLATE,x)
     constrained_mxn_layers = ga.Constrained(
                                     fn=fn,
-                                    layers=mxn_layers,
                                     thresh=lambda p : max(map(fn,p)) <=4,
+                                    layers=mxn_layers,
                                     )
-    #helper = lambda mutant : sum([i == 'A' for i in mutant])
 
     pipeline = ga.Sequential(
                              ga.Evaluate(helper, max_workers=POP_SIZE),
                              ga.PickBottom(),
                              ga.Clone(POP_SIZE),
-                             constrained_mxn_layers,
+                             #constrained_mxn_layers,
+                             ga.RandomMutate(),
+                             ga.CrossOver(),
                             )
+    pop = [ga.random_mutate(TEMPLATE) for _ in range(POP_SIZE)] # init
 
-    print(len(pop))
     for _ in tqdm(range(N_GENERATIONS)):
         pop = pipeline(pop)
         #evo.gc(RUN_ID)
-        print(len(pop))
-        print(pop)
-        #print(f'\033[0;36m n mutants: {len(pop)}')
-        #print(f'\033[0;36m {pipeline.log}')
-        #print(pop)
-        #print(f'\033[0;36m n mutants: {len(pop)}')
-        #print(f'\033[0;36m end of iteration {_}')
+        print(f'\033[0;36m {pop}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
