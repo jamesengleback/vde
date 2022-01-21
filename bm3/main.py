@@ -66,6 +66,8 @@ def evaluate(gene,
                                    exhaustiveness=exhaustiveness)
     print('\033[0;36m docked')
     dist_mean, aff_mean, score = score_fn(protein, docking_results)
+    #score, dist_mean, aff_mean = score_fn(protein, docking_results) # should be this
+
     print('\033[0;36m scored')
 
     out_dir = osp.join(out_dir_root,gene) # if out_dir_root is not None else None

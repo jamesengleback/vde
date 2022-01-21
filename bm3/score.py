@@ -30,7 +30,9 @@ def score_b(protein, results):
     def softmax(arr):
         e = np.exp(arr - max(arr))
         return e / sum(e)
-    return np.mean(distances * softmax(abs(affinities)))
+    return np.mean(distances * softmax(abs(affinities))), \
+           distances.mean(), \
+           affinities.mean()
 
 def test():
     p = enz.protein('DM-Mesotrione/clean_receptor.pdb',
