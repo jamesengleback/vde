@@ -1,7 +1,0 @@
-setup.py
-evo/__init__.py
-evo/evo.py
-evo.egg-info/PKG-INFO
-evo.egg-info/SOURCES.txt
-evo.egg-info/dependency_links.txt
-evo.egg-info/top_level.txt
