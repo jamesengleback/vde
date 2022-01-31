@@ -30,3 +30,8 @@ Score function is defined in `evo/score.py`
     ├── wt
     └── wt.py
 ```
+
+```
+Message from syslogd@localhost at Jan 19 15:59:42 ...
+ kernel:[ 4199.022874] watchdog: BUG: soft lockup - CPU#32 stuck for 24s! [vina:42936]
+```

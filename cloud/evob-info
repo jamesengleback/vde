@@ -1,0 +1,5 @@
+label evob
+ip 185.3.95.145
+id 33979827
+root_pass root@evob
+u0_pass u0@evob

@@ -1,0 +1,6 @@
+,mode,affinity (kcal/mol),dist from best mode - rmsd - ub,dist from best mode - lb
+0,1.0,-6.5,0.0,0.0
+1,2.0,-6.4,2.276,3.265
+2,3.0,-6.1,2.177,3.255
+3,4.0,-5.8,1.721,2.647
+4,5.0,-5.2,2.087,3.094
