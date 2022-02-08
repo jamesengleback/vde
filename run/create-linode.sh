@@ -1,10 +1,12 @@
 #!/bin/bash
 
-pass generate -f root@evob > /dev/null
-pass generate -f u0@evob > /dev/null
-ROOT_PASS=$(pass root@evob)
-USER_PASS=$(pass user@evob)
-LABEL=evob
+
+LABEL="vde-socks"
+
+pass generate -f root@$LABEL > /dev/null
+pass generate -f user@$LABEL > /dev/null
+ROOT_PASS=$(pass root@$LABEL)
+USER_PASS=$(pass user@$LABEL)
 
 linode-cli linodes create \
 	--type g6-dedicated-8 \
