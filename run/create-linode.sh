@@ -3,11 +3,11 @@
 pass generate -f root@evob > /dev/null
 pass generate -f u0@evob > /dev/null
 ROOT_PASS=$(pass root@evob)
-U0_PASS=$(pass u0@evob)
+USER_PASS=$(pass user@evob)
 LABEL=evob
 
 linode-cli linodes create \
-	--type g6-dedicated-50 \
+	--type g6-dedicated-8 \
 	--region eu-west \
 	--label $LABEL \
 	--image linode/debian11 \
@@ -20,7 +20,7 @@ echo "label $LABEL"            >   $LABEL-info
 echo "ip $IP"                  >>  $LABEL-info
 echo "id $ID"                  >>  $LABEL-info
 echo "root_pass root@evob"      >>  $LABEL-info
-echo "u0_pass u0@evob"          >>  $LABEL-info
+echo "user_pass user@evob"          >>  $LABEL-info
 
 LOOP=true
 while $LOOP; do
@@ -32,19 +32,17 @@ while $LOOP; do
 		linode-cli linodes view $ID
 		sshpass -p$ROOT_PASS scp -r config root@$IP:~
 		sshpass -p$ROOT_PASS ssh root@$IP "~/config/setuproot.sh $U0_PASS"
-		sshpass -p$U0_PASS  ssh u0@$IP '~/setupu0.sh'
-		#sshpass -p$ROOT_PASS ssh-copy-id root@$IP
-		#sshpass -p$U0_PASS ssh-copy-id u0@$IP
+		sshpass -p$USER_PASS  ssh user@$IP '~/setupu0.sh'
 		break
 	fi
 done
 
 linode-cli linodes view $ID
 sshpass -p$ROOT_PASS scp -r config root@$IP:~
-sshpass -p$ROOT_PASS ssh root@$IP "~/config/setuproot.sh $U0_PASS"
-sshpass -p$U0_PASS  ssh u0@$IP '~/setupu0.sh'
+sshpass -p$ROOT_PASS ssh root@$IP "~/config/setuproot.sh $user_PASS"
+sshpass -p$user_PASS  ssh user@$IP '~/setupuser.sh'
 sshpass -p$ROOT_PASS ssh-copy-id root@$IP
-sshpass -p$U0_PASS ssh-copy-id u0@$IP
+sshpass -p$user_PASS ssh-copy-id user@$IP
 #linode-cli linodes delete $ID
 
 echo "alias evob='ssh root@$IP'" >> ~/.bashrc
