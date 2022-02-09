@@ -1,4 +1,4 @@
-#!/home/u0/miniconda3/envs/enz/bin/python
+#!/home/user/miniconda3/envs/enz/bin/python
 import sys
 import socket
 import os

@@ -18,28 +18,28 @@ then
 	chmod +x $FNAME
 	./$FNAME -b
 	~/miniconda3/bin/conda init
-source ~/.bashrc
-
-# --- enz ---
-source ~/miniconda3/etc/profile.d/conda.sh
-cd ~/src
-git clone https://github.com/jamesengleback/enz
-git clone https://github.com/jamesengleback/ga
-cd enz
-conda env create -f env.yml
-conda activate enz
-
 else
 	echo $miniconda.urls
 	echo $DOWNLOAD
 fi
 
+source ~/.bashrc
+source ~/miniconda3/etc/profile.d/conda.sh
+
+# --- enz ---
+cd ~/src
+git clone https://github.com/jamesengleback/enz
+cd enz
+conda env create -f env.yml
+conda activate enz
+
+
 # --- linode ---
 cd ~/src
 pip install boto
 pip install linode-cli
+# linode-cli configure
 
-##### get token!
 linode-cli obj get james-engleback PyRosetta4.MinSizeRel.python38.ubuntu.release-284.tar.bz2
 
 # --- pyrosetta ---
@@ -48,11 +48,9 @@ pip install ~/src/PyRosetta4.MinSizeRel.python38.ubuntu.release-284/setup
 
 
 pip install ~/src/enz
-pip install ~/src/ga
 
 cd ~
-git clone https://github.com/jamesengleback/evo
-cd evo
-git fetch origin doesitwork
-git checkout doesitwork
-pip install ~/evo
+git clone https://github.com/jamesengleback/vde
+cd vde
+git fetch origin sock
+git checkout sock

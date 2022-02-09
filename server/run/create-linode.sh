@@ -1,7 +1,6 @@
 #!/bin/bash
 
-
-LABEL="vde-socks"
+LABEL="vde-flask"
 
 pass generate -f root@$LABEL > /dev/null
 pass generate -f user@$LABEL > /dev/null
@@ -9,7 +8,7 @@ ROOT_PASS=$(pass root@$LABEL)
 USER_PASS=$(pass user@$LABEL)
 
 linode-cli linodes create \
-	--type g6-dedicated-8 \
+	--type g6-dedicated-4 \
 	--region eu-west \
 	--label $LABEL \
 	--image linode/debian11 \
@@ -21,8 +20,8 @@ IP=$(linode-cli linodes list  | grep $LABEL | awk '{print $14}')
 echo "label $LABEL"            >   $LABEL-info
 echo "ip $IP"                  >>  $LABEL-info
 echo "id $ID"                  >>  $LABEL-info
-echo "root_pass root@evob"      >>  $LABEL-info
-echo "user_pass user@evob"          >>  $LABEL-info
+echo "root_pass root@$LABEL"   >>  $LABEL-info
+echo "user_pass user@$LABEL"   >>  $LABEL-info
 
 LOOP=true
 while $LOOP; do
