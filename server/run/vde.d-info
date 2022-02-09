@@ -1,0 +1,5 @@
+label vde.d
+ip 176.58.112.195
+id 34643223
+root_pass root@vde.d
+user_pass user@vde.d

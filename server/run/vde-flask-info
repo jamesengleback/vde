@@ -1,5 +1,5 @@
 label vde-flask
-ip 139.162.224.7
-id 34640485
+ip 212.71.235.93
+id 34642478
 root_pass root@vde-flask
 user_pass user@vde-flask
