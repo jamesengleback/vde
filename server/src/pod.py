@@ -4,12 +4,9 @@ from flask import Flask
 from flask import request
 
 import enz
-from utils import score_c
+from utils import score_b
 
 app = Flask(__name__)
-
-with open('config.json') as f:
-    config = json.load(f)
 
 def evaluate(sequence,
              config,
@@ -32,10 +29,14 @@ def main():
     record = json.loads(request.data)
     assert 'seq' in record.keys()
     seq = record['seq']
-    return json.dumps({'score':evaluate(seq,
-                                        config,
-                                        score_fn=score_c)})
+    return json.dumps(evaluate(seq,
+                               config,
+                               score_fn=score_b))
 
 if __name__ == '__main__':
-    port = int(sys.argv[1])
-    app.run(host='localhost',port=port)
+    p = int(sys.argv[1]) if len(sys.argv) > 1 else 5000
+    CONFIG = sys.argv[2]
+    with open('config.json') as f:
+        config = json.load(f)
+
+    app.run(host='localhost',port=p)

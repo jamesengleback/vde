@@ -1,6 +1,7 @@
+import sys
 import requests
 import json
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 
 def get(seq,
         addr,
@@ -10,17 +11,18 @@ def get(seq,
     #d = {**d, **kwargs}
     r = requests.get(addr, data=json.dumps(d))
     if r.status_code == 200:
-        return r.text
+        return json.loads(r.text)
     else:
         return r.status_code
 
 BM3_DM='MTIKEMPQPKTFGELKNLPLLNTDKPVQALMKIADELGEIFKFEAPGRVTRYLSSQRLIKEACDESRFDKNLSQALKFVRDFVGDGLVTSWTHEKNWKKAHNILLPSFSQQAMKGYHAMMVDIAVQLVQKWERLNADEHIEVPEDMTRLTLDTIGLCGFNYRFNSFYRDQPHPFITSMVRALDEAMNKLQRANPDDPAYDENKRQFQEDIKVMNDLVDKIIADRKASGEQSDDLLTHMLNGKDPETGEPLDDENIRYQIITFLIAGHETTSGLLSFALYFLVKNPHVLQKAAEEAARVLVDPVPSYKQVKQLKYVGMVLNEALRLWPTAPAFSLYAKEDTVLGGEYPLEKGDELMVLIPQLHRDKTIWGDDVEEFRPERFENPSAIPQHAFKPFGNGQRACIGQQFALHEATLVLGMMLKHFDFEDHTNYELDIKETLTLKPEGFVVKAKSKKIPLGGIPSPSTEQSAKKVRK*'
 
 if __name__ == '__main__':
-    def helper(port): 
-        return get(seq=BM3_DM, 
-                   addr=f"http://127.0.0.1:{port}",
-                   exhaustiveness=1)
-    with ProcessPoolExecutor() as pool:
-        results = pool.map(helper, range(5000, 5005))
-    print([json.loads(i) for i in results if i is not None])
+    p = int(sys.argv[1]) if len(sys.argv) > 1 else 5000
+
+    helper = lambda p : get(seq=BM3_DM, 
+                            addr=f"http://localhost:{p}", 
+                            exhaustiveness=1)          
+    with ThreadPoolExecutor() as pool:
+        results = pool.map(helper, [5001,5002,5003,5004])
+    o = list(results)
