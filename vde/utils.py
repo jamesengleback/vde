@@ -1,6 +1,28 @@
 import enz
 import numpy as np
 
+def write_json(dictionary, path, mode='a'):
+    with open(path,mode) as f:
+        json.dump(dictionary,f)
+
+def write_csv(dictionary, path):
+    df = pd.DataFrame([dictionary])
+    if osp.exists(path):
+        df.to_csv(path, mode='a', index=False, header=False)
+    else:
+        df.to_csv(path, index=False)
+
+def gc(string_match):
+    # garbage collection
+    # can clash with other enz runs!
+    files = [os.path.join('/tmp',i) for i in os.listdir('/tmp')]
+    enz_files = [i for i in files if f'{string_match}_enz' in i]
+    for i in enz_files:
+        if os.path.isfile(i):
+            os.remove(i)
+        elif os.path.isdir(i):
+            shutil.rmtree(i)
+
 def c20_fe_distance(protein, vina_pose):
     fe = protein.df.loc[protein.df['element_symbol'] == 'FE',\
             ['x_coord', 'y_coord', 'z_coord']].values
