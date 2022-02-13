@@ -28,9 +28,9 @@ def score_b(protein, results):
     def softmax(arr):
         e = np.exp(arr - max(arr))
         return e / sum(e)
-    return np.mean(distances * softmax(abs(affinities))), \
-           distances.mean(), \
-           affinities.mean()
+    return {'score_b' : np.mean(distances * softmax(abs(affinities))), \
+            'distances.mean' : distances.mean(), \
+            'affinities.mean' : affinities.mean()}
 
 def score_c(protein, results):
     affinities = np.array([i['affinity'] for i in results]).astype(float)
