@@ -1,5 +1,6 @@
-import enz
+import json
 import numpy as np
+import enz
 
 def write_json(dictionary, path, mode='a'):
     with open(path,mode) as f:

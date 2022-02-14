@@ -1,6 +1,8 @@
 import enz
 import numpy as np
 
+BLUE='\033[0;36m '
+
 def softmax(arr):
     e = np.exp(arr - max(arr))
     return e / sum(e)
@@ -24,14 +26,18 @@ def score_a(protein, results):
     #### dodgy
     affinities = np.array([i['affinity'] for i in results]).astype(float)
     distances = np.array([c20_fe_distance(protein, i['mol']) for i in results])
-    return np.mean(distances) - np.log(abs(affinities).mean())
+    score = np.mean(distances) - np.log(abs(affinities).mean())
+    return {'score': score, 
+            'distance_mean':distances.mean(),
+            'affinities_mean':affinities.mean()}
 
 def score_b(protein, results):
     affinities = np.array([i['affinity'] for i in results]).astype(float)
     distances = np.array([c20_fe_distance(protein, i['mol']) for i in results])
-    return np.mean(distances * softmax(abs(affinities))), \
-           distances.mean(), \
-           affinities.mean()
+    score = np.mean(distances * softmax(abs(affinities)))
+    return {'score': score, 
+            'distance_mean':distances.mean(),
+            'affinities_mean':affinities.mean()}
 
 def score_c(protein, results):
     affinities = np.array([i['affinity'] for i in results]).astype(float)
@@ -39,6 +45,6 @@ def score_c(protein, results):
     softAff = softmax(abs(affinities))
     e = sum(affinities)
     score = np.mean(softAff * distances)  - np.log(abs(e))
-    return score, \
-           distances.mean(), \
-           affinities.mean()
+    return {'score': score, 
+            'distance_mean':distances.mean(),
+            'affinities_mean':affinities.mean()}

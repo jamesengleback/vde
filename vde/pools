@@ -1,0 +1,16 @@
+time python main.py  -p 4 -s 0.5 -n 1 ; echo ThreadPoolExecutor
+real	0m46.894s
+user	1m48.104s
+sys	0m1.546s
+ThreadPoolExecutor
+
+time python main.py  -p 4 -s 0.5 -n 1 ; echo ProcessPoolExecutor
+did not execute
+ProcessPoolExecutor
+
+multiprocessing.pool.ThreadPool
+time python main.py  -p 4 -s 0.5 -n 1 ; echo ThreadPool
+real    0m50.329s
+user    1m46.882s
+sys     0m1.815s
+ThreadPool

@@ -1,9 +1,8 @@
 import os
 import os.path as osp
+import heapq
 import random
 from string import ascii_lowercase
-import json
-from tqdm import tqdm
 import argparse
 import shutil
 import pandas as pd
@@ -14,6 +13,8 @@ import ga
 import utils
 from utils import BM3_DM, MXN_SITES, DOCKING_SITE
 from sfxns import score_a, score_b, score_c, mean_dists_affs
+
+BLUE='\033[0;36m '
 
 def evaluate(gene,
              out_dir_root,
@@ -32,17 +33,18 @@ def evaluate(gene,
     docking_results = protein.dock('CS(=O)(=O)C1=CC(=C(C=C1)C(=O)C2C(=O)CCCC2=O)[N+](=O)[O-]',
                                    target_sites=DOCKING_SITE,
                                    exhaustiveness=exhaustiveness)
-    dist_mean, aff_mean, score = score_fn(protein, docking_results)
+    scores = score_fn(protein, docking_results)
     out_dir = osp.join(out_dir_root,gene) 
     docking_results.save(out_dir)
     ham = ga.hamming(template, gene)
-    score += ham
-    return {'gene':gene, 
-            'score':score, 
-            'dist_mean':dist_mean, 
-            'aff_mean':aff_mean, 
-            'ham':ham,
-            }
+    scores['ham'] = ham
+    scores['score'] += ham
+    shutil.rmtree(protein.CACHE)
+    shutil.rmtree(list(map(\
+            lambda mol : "/".join(mol.struc.split("/")[:3]),
+            docking_results.poses.values()))[0])
+    #print(f'\033[0;36m {scores}')
+    return scores
 
 
 def main(args):
@@ -53,12 +55,14 @@ def main(args):
     EXHAUSTIVENESS = args.exhaustiveness
     SCOREFN = args.score_fn
     assert SCOREFN in {'a','b','c'}
+    score_fn = {'a':score_a, 'c':score_c, 'c':score_c}[SCOREFN]
     RUN_ID = ''.join(random.choices(ascii_lowercase, k=5))
     OUTDIR = osp.join(args.outdir,RUN_ID)
     os.makedirs(OUTDIR)
     SCORES_CSV = osp.join(OUTDIR,'scores.csv')
     TEMPLATE = ''.join([BM3_DM[i] for i in MXN_SITES])
     VOCAB='ACDEFGHIKLMNPQRSTVWY'
+    #code_path =osp.join(OUTDIR, 'evo_used.py') 
     CONFIG = {'POP_SIZE':POP_SIZE,
               'N_GENERATIONS':N_GENERATIONS,
               'SURVIVAL':SURVIVAL,
@@ -68,10 +72,13 @@ def main(args):
               'OUTDIR':OUTDIR, 
               'SCOREFN':SCOREFN}
     config_path = osp.join(OUTDIR, 'config.json')
-    scores_path =osp.join(OUTDIR, 'scores.json') 
-    code_path =osp.join(OUTDIR, 'evo_used.py') 
     utils.write_json(CONFIG, config_path)
-    score_fn = {'a':score_a, 'c':score_c, 'c':score_c}[SCOREFN]
+    pd.DataFrame([], columns= ['gene',
+                               'score',
+                               'distance_mean',
+                               'affinities_mean',
+                               'ham',   
+                               'uid']).to_csv(SCORES_CSV)
     # ---
     def helper(gene):
         output = evaluate(gene, 
@@ -82,25 +89,26 @@ def main(args):
                           score_fn=score_fn)
         uid = ''.join(random.choices(ascii_lowercase, k=5))
         output['uid'] = uid
-        scores_path = osp.join(OUTDIR, 'scores.csv')
-        utils.write_csv(output, scores_path)
-        return output['score']
+        return output
 
     pop = [ga.random_mutate(TEMPLATE) for _ in range(POP_SIZE)] # init
 
-    for _ in tqdm(range(N_GENERATIONS)):
-        pop, scores = ga.evaluate(helper, pop)
-        #scores_ = ga.evaluate(gene_pool, eval_helper)
-        #scores = dict(zip(*scores_))
+    for _ in range(N_GENERATIONS):
+        scores = ga.evaluate(helper, pop)
         best = heapq.nsmallest(round(SURVIVAL * POP_SIZE),
                                 scores.keys(),
                                 key = lambda i : scores[i]['score'])
         pop = [ga.crossover(*random.choices(best,k=2)) for _ in range(POP_SIZE)]
-        pop = [ga.mutate(i) for i in pop]
+        pop = [ga.random_mutate(i) for i in pop]
 
-        out = pd.DataFrame(scores).T
-        out['gene'] =  gene_pool
-        out.to_csv(scores_csv, mode='a', header=None)
+        out = pd.DataFrame(scores).T.reset_index()
+        out.columns = ['gene',
+                       'score',
+                       'distance_mean',
+                       'affinities_mean',
+                       'ham',   
+                       'uid']
+        out.to_csv(SCORES_CSV, mode='a', header=None, index=None)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

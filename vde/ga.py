@@ -1,8 +1,8 @@
 import random
 import heapq
 import json
-#from multiprocessing.pool import ThreadPool, Pool
-from concurrent.futures import ThreadPoolExecutor#, ProcessPoolExecutor
+from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 
 AAS = list('ACDEFGHIKLMNPQRSTVWY')
 
@@ -54,18 +54,11 @@ def crossover(a:str,
     cut = random.randint(1,min(len(a),len(b))-1)
     return random.choice([a[:cut] + b[cut:], b[:cut] + a[cut:]])
 
-def evaluate(gene_pool, 
-             fn, 
+def evaluate(fn, 
+             gene_pool,
              **kwargs):
-    ''' gene_pool : iterable (except generators)
-        fn : function to map to gene_pool
-        map a function to an iterable with multiprocessing 
-        return original iterable (?generators) and list of 
-        function evaluations
-
-    '''
-    #fn = lambda x : fn_(x,  **kwargs)
-    with ThreadPoolExecutor(**kwargs) as process_pool :
+    with ThreadPool(**kwargs) as process_pool :
         results = process_pool.map(fn, gene_pool)
-    return gene_pool, list(results)
+    return dict(zip(gene_pool, results))
 
+BLUE='\033[0;36m '
