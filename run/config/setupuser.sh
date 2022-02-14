@@ -24,7 +24,6 @@ source ~/.bashrc
 source ~/miniconda3/etc/profile.d/conda.sh
 cd ~/src
 git clone https://github.com/jamesengleback/enz
-git clone https://github.com/jamesengleback/ga
 cd enz
 conda env create -f env.yml
 conda activate enz
@@ -48,11 +47,9 @@ pip install ~/src/PyRosetta4.MinSizeRel.python38.ubuntu.release-284/setup
 
 
 pip install ~/src/enz
-pip install ~/src/ga
 
 cd ~
-git clone https://github.com/jamesengleback/evo
+git clone https://github.com/jamesengleback/vde
 cd evo
-git fetch origin doesitwork
-git checkout doesitwork
-pip install ~/evo
+git fetch origin x3
+git checkout x3
