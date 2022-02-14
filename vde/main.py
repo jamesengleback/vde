@@ -43,7 +43,6 @@ def evaluate(gene,
     shutil.rmtree(list(map(\
             lambda mol : "/".join(mol.struc.split("/")[:3]),
             docking_results.poses.values()))[0])
-    #print(f'\033[0;36m {scores}')
     return scores
 
 
