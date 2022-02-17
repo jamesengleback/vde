@@ -11,7 +11,7 @@ import enz
 
 import ga
 import utils
-from utils import BM3_DM, MXN_SITES_RED, DOCKING_SITE
+from utils import BM3_DM, MXN_SITES_RED_0, DOCKING_SITE
 from sfxns import score_a, score_b, score_c, mean_dists_affs
 
 BLUE='\033[0;36m '
@@ -23,8 +23,8 @@ def evaluate(gene,
              exhaustiveness=16,
              run_id=None,
              ):
-    assert len(gene) == len(MXN_SITES_RED)
-    sequence = utils.mutate_string(BM3_DM, dict(zip(MXN_SITES_RED, gene)))
+    assert len(gene) == len(MXN_SITES_RED_0)
+    sequence = utils.mutate_string(BM3_DM, dict(zip(MXN_SITES_RED_0, gene)))
     protein = enz.Protein('4KEY.pdb',
                           seq=sequence, 
                           keep=['HEM'],
@@ -60,7 +60,7 @@ def main(args):
     OUTDIR = osp.join(args.outdir,RUN_ID)
     os.makedirs(OUTDIR)
     SCORES_CSV = osp.join(OUTDIR,'scores.csv')
-    TEMPLATE = ''.join([BM3_DM[i] for i in MXN_SITES_RED])
+    TEMPLATE = ''.join([BM3_DM[i] for i in MXN_SITES_RED_0])
     VOCAB='ACDEFGHIKLMNPQRSTVWY'
     #code_path =osp.join(OUTDIR, 'evo_used.py') 
     CONFIG = {'POP_SIZE':POP_SIZE,
@@ -68,7 +68,7 @@ def main(args):
               'SURVIVAL':SURVIVAL,
               'EXHAUSTIVENESS':EXHAUSTIVENESS,
               'VOCAB':VOCAB,
-              'MXN_SITES':MXN_SITES_RED,
+              'MXN_SITES':MXN_SITES_RED_0,
               'OUTDIR':OUTDIR, 
               'SCOREFN':SCOREFN}
     config_path = osp.join(OUTDIR, 'config.json')
