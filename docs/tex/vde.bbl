@@ -1,0 +1,132 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{chaudhury2010pyrosetta}{article}{}
+      \name{author}{3}{}{%
+        {{hash=95c1857e27790efd2e77725e0d8aec04}{%
+           family={Chaudhury},
+           familyi={C\bibinitperiod},
+           given={Sidhartha},
+           giveni={S\bibinitperiod}}}%
+        {{hash=c7d48362d360e81fac591a4d464ebe5b}{%
+           family={Lyskov},
+           familyi={L\bibinitperiod},
+           given={Sergey},
+           giveni={S\bibinitperiod}}}%
+        {{hash=116062c1569a60903bbe972883b6e7eb}{%
+           family={Gray},
+           familyi={G\bibinitperiod},
+           given={Jeffrey\bibnamedelima J},
+           giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Oxford University Press}%
+      }
+      \strng{namehash}{f56362200c04d5d23489c1c250600f67}
+      \strng{fullhash}{f56362200c04d5d23489c1c250600f67}
+      \strng{bibnamehash}{f56362200c04d5d23489c1c250600f67}
+      \strng{authorbibnamehash}{f56362200c04d5d23489c1c250600f67}
+      \strng{authornamehash}{f56362200c04d5d23489c1c250600f67}
+      \strng{authorfullhash}{f56362200c04d5d23489c1c250600f67}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Bioinformatics}
+      \field{number}{5}
+      \field{title}{PyRosetta: a script-based interface for implementing molecular modeling algorithms using Rosetta}
+      \field{volume}{26}
+      \field{year}{2010}
+      \field{pages}{689\bibrangedash 691}
+      \range{pages}{3}
+    \endentry
+    \entry{trott2010autodock}{article}{}
+      \name{author}{2}{}{%
+        {{hash=4a4f9e841fae09e46988ea87c501122e}{%
+           family={Trott},
+           familyi={T\bibinitperiod},
+           given={Oleg},
+           giveni={O\bibinitperiod}}}%
+        {{hash=9dbfbd7d8c9609b4c77dec5b8e7c2c3e}{%
+           family={Olson},
+           familyi={O\bibinitperiod},
+           given={Arthur\bibnamedelima J},
+           giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Wiley Online Library}%
+      }
+      \strng{namehash}{98fd8ffea028cee40ae16a311a5ba819}
+      \strng{fullhash}{98fd8ffea028cee40ae16a311a5ba819}
+      \strng{bibnamehash}{98fd8ffea028cee40ae16a311a5ba819}
+      \strng{authorbibnamehash}{98fd8ffea028cee40ae16a311a5ba819}
+      \strng{authornamehash}{98fd8ffea028cee40ae16a311a5ba819}
+      \strng{authorfullhash}{98fd8ffea028cee40ae16a311a5ba819}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of computational chemistry}
+      \field{number}{2}
+      \field{title}{AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading}
+      \field{volume}{31}
+      \field{year}{2010}
+      \field{pages}{455\bibrangedash 461}
+      \range{pages}{7}
+    \endentry
+    \entry{dunbrack1993backbone}{article}{}
+      \name{author}{2}{}{%
+        {{hash=6634b0aef3d39acfb5aa218efb52e896}{%
+           family={Dunbrack\bibnamedelima Jr},
+           familyi={D\bibinitperiod\bibinitdelim J\bibinitperiod},
+           given={Roland\bibnamedelima L},
+           giveni={R\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=5743d79be0ffa377a441f1fe37a0d8cd}{%
+           family={Karplus},
+           familyi={K\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{beb2e24a0697cdea8f2149eaa8b608b8}
+      \strng{fullhash}{beb2e24a0697cdea8f2149eaa8b608b8}
+      \strng{bibnamehash}{beb2e24a0697cdea8f2149eaa8b608b8}
+      \strng{authorbibnamehash}{beb2e24a0697cdea8f2149eaa8b608b8}
+      \strng{authornamehash}{beb2e24a0697cdea8f2149eaa8b608b8}
+      \strng{authorfullhash}{beb2e24a0697cdea8f2149eaa8b608b8}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of molecular biology}
+      \field{number}{2}
+      \field{title}{Backbone-dependent rotamer library for proteins application to side-chain prediction}
+      \field{volume}{230}
+      \field{year}{1993}
+      \field{pages}{543\bibrangedash 574}
+      \range{pages}{32}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

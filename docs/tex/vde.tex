@@ -1,0 +1,131 @@
+\documentclass[16pt]{article}
+\usepackage{fontspec}
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{geometry}
+\usepackage{alltt}
+\usepackage[backend=biber, citestyle=numeric, sorting=none]{biblatex}
+\addbibresource{vde.bib}
+
+\setmainfont{Noto Sans}
+\hypersetup{urlcolor=blue, linkcolor=black, citecolor=black, colorlinks=true}
+\author{James Engleback}
+
+\begin{document}
+\title{\textbf{VDE}}
+\maketitle
+\tableofcontents
+
+\section{Abstract}
+% ----------------
+\section{Introduction}
+
+\subsection{Background}
+\subsubsection{Herbicide Resistant Crops}
+Herbicide-resistant crops are important for global agriculture because they mitigate yield losses due to weeds and give farmers extra flexibility in their herbicide application programs, which is important to suppress emergence of herbicide-resistant weeds. 
+% value statement
+
+Herbicides kill plants by inhibiting key metabolic processes and their species-specificity is determined by susceptibility of herbicide target and their ability to  metabolize the herbicide. % herbicide overview
+HPPD inhibitors are a key herbicide class that cause leaf bleaching and death in susceptible plants. 
+HPPD inhibition  disrupts tyrosine catabolism which disrupts UV-protection via carotenoid production and photosynthetic electron shuttling via plastoquinone, leading to death by UV damage and radical toxicity. % HPPDs
+
+Engineering HPPD-inhibitor resistance into plants have used the HPPD and metabolic enzymes from naturally resistant species like \textit{Avena fatua}, which employs cytochrome P450 Cyp72A1  to initiate metabolism of mesotrione by ring hydroxylation at $C_5$.
+In this case, the $C_5$ hydroxylation acts as a target site for glutathione-S-transferases which conjugate glutathione to xenobiotics.
+The glutathione conjugate tags the xenobiotic for sequestration in the cell vacuole, which neutralises the threat.
+
+Engineered Cyp72A1 has been explored as a means of HPPD herbicide in soybean, which is an important target recipient for HPPD resistance traits. % cyp 72a1 & engineering attempts
+%%%%% CYP71A1 stuff
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{img/mesotrione+metabolite.png}
+	\caption{\label{mesotrione} The HPPD inhibiting herbicide mesotrione and its primary metabolite 5-hydroxy-mesotrione in mesotrione-resistant strains of \textit{A. fatua}.}
+\end{figure}
+
+\subsubsection{Cytochrome P450s}
+Cytochrome P450s are a ubiquitous class of heme-dependent oxido-reductases that are frequently involved in xenobiotic metabolism. % P450s overview
+Bacterial P450s have been engineered to catalyse a range of xenobiotic biotransformations. 
+The bacterial P450 BM3 from \textit{Bacillus megaterium} is one such bacterial P450 whose structure has been studied extensively. 
+The A82F/F87V mutant has a broad substrate specificity, however it has no activity towards the HPPD herbicide mesotrione. % bacterial P450 engineering
+
+\subsubsection{Virtual Directed Evolution}
+Enzymes can be designed computationally using a genetic algorithm that evaluates the fitness of mutants by simulating the interaction between a target substrate and the predicted structure of the mutant. % computational enzyme edsign
+
+The structure of a mutant can be predicted based on a template using techniques such as side-chain repacking by stochastic sampling from rotamer libraries and loop remodelling by cyclic coordinate descent. % structure pred - side chain repacking and loop ccd
+
+% vde
+Binding site interaction can be predicted using molecular docking, which attempts to predict likely protein-ligand binding conformations. 
+A combination of the energy score and the conformation of docked molecules can be used to estimate likelihood of desirable reaction and therefore the fitness of a mutant. %score
+In rounds of selection within a genetic algorithm, the fitness of a batch of mutants is evaluated by scoring desirability of protein-ligand binding, the fittest mutants are selected for breeding, in which mutants have elements of their genes recombined are further mutated, then the cycle repeats.   % genetic algorithms
+
+\subsection{Technologies Used}
+\subsubsection{Directed Evolution}
+\subsubsection{Structure-Based Design}
+\subsubsection{Protein Structure Prediction}
+\subsubsection{Docking}
+\subsubsection{Sequence Optimization Algorithms}
+\subsubsection{Overview of this work}
+\subsubsection{Engineering Problem}
+\subsection{Overview of this Work}
+
+Here, in attempt to engineer a mutant of the Cytochrome P450 BM3 to hydroxylate mesotrione at the $C_5$ position is made by developing a \textit{VDE} system, deploying it at scale on cloud infrastructure and identification on clusters of putatively active mutants.
+% ----------------
+\section{Methods}
+
+\textit{VDE} requires protein structure prediction and molecular docking to predict the behaviour of mutants, so the \texttt{python} package \texttt{enz} is developed to automate and abstract this functionality in section \ref{enz}.
+A score function that attempts to predict the likelihood of a $C_5$ hydroxylation of mesotrione is develop in section \ref{scorefn}.
+A genetic algorithm to optimize the sequence of BM3 mutants is discussed in section \ref{ga} and section \ref{cloud} describes execution of the algorithm at scale on cloud infrastructure.
+
+\subsection{\texttt{enz} \label{enz}}
+
+Abstraction and modularization of protein structure prediction and molecular docking was important for reducing complexity of experiments and developability of the algorithm.
+To this end the \texttt{python} package \texttt{enz} was created, an \textit{Application Program Interface (API)} wrapper around the \textit{PyRosetta} \cite{chaudhury2010pyrosetta} protein structure prediction software and the \textit{Autodock VINA} \cite{trott2010autodock} binary.
+The package is modular enough to allow replacement of its functionality-providing back-ends according to a users requirements and is hosted at \href{https://github.com/jamesengleback/enz}{https://github.com/jamesengleback/enz}
+
+The user-exposed command set is minimal and uses side chain repacking \cite{dunbrack1993backbone} functionality from \textit{PyRosetta} for template-based structure prediction.
+
+\begin{alltt}
+        import enz \\
+        sequence = 'MKTIKEM...' \\
+        p = enz.protein('4KEY.pdb', 
+                        seq=sequence, 
+                        cofactors=['HEM']) \# 1. - initialization \\
+        p.mutate(181, 'S') \# 2. mutation\\
+        p.mutate(87, 'A')\\
+        p.refold() \# 3. refolding\\
+        results = p.dock('CCCCCCCCCCCC=O', 
+                         target\_residues=[49, 75, 87, 181, 263, 330, 400]) \# 4. docking \\
+        results.save('docking-run-fatty-acid') \# save docking results
+\end{alltt}
+
+
+\subsection{Score function \label{scorefn}}
+The heuristic currently employed to estimate the desirability of each set of docking results is % heuristic
+\begin{equation}
+score = \frac{1}{n}\Sigma _{N} \Delta G_{i} \times d_{i}
+\end{equation}
+where $ \Delta G $ is free energy of the interaction calculated by \textit{autodock vina} (\textit{kcal / mol}) and $ d $ is the distance between the heme iron and the $C^{5}$ of mesotrione for $ n $ in binding poses \textbf{(figure \ref{score})}. 
+Where $C^{5}$ is the target carbon for hydroxylation. 
+It may be sufficient for use in the genetic algorithm but can be flexibly changed if needed. % heuristic
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{img/score.png}
+	\caption{\label{score} - Distance $d$  between carbon $C_5$ of mesotrione and the heme iron of BM3, used in the fitness score (\AA)}
+\end{figure}
+
+\subsection{Genetic Algorithm \label{ga}}
+\subsection{Cloud Deployment \label{cloud}}
+% ----------------
+\section{Results}
+
+% ----------------
+\section{Discussion and Future Work}
+
+
+\printbibliography
+\end{document}

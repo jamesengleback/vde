@@ -1,0 +1,62 @@
+site_name: Virtual Directed Evolution
+repo_url: https://github.com/jamesengleback/vde
+
+theme:
+  name: material
+  font: 
+    text: Noto Sans
+    code: Noto Sans Mono
+  palette:
+    theme: slate
+    primary: teal
+    accent: cyan
+  favicon: img/logo.svg
+  logo : img/logo.svg
+
+nav:
+  - index.md
+
+
+markdown_extensions:
+  - footnotes
+  - attr_list
+  - md_in_html
+  - toc
+  - smarty
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - mermaid2:
+      arguments:
+              theme: 'neutral'
+  - bibtex:
+      bib_file: "refs.bib"
+      cite_style: "pandoc"
+      bib_command: \bib
+
+extra_css:
+  - https://unpkg.com/mermaid@7.1.2/dist/mermaid.css
+
+extra_javascript:
+  - https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - extra/refresh_on_toggle_dark_light.js
