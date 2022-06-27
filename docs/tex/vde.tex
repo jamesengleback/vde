@@ -109,13 +109,12 @@ The heuristic currently employed to estimate the desirability of each set of doc
 \begin{equation}
 score = \frac{1}{n}\Sigma _{N} \Delta G_{i} \times d_{i}
 \end{equation}
-where $ \Delta G $ is free energy of the interaction calculated by \textit{autodock vina} (\textit{kcal / mol}) and $ d $ is the distance between the heme iron and the $C^{5}$ of mesotrione for $ n $ in binding poses \textbf{(figure \ref{score})}. 
-Where $C^{5}$ is the target carbon for hydroxylation. 
-It may be sufficient for use in the genetic algorithm but can be flexibly changed if needed. % heuristic
+where $\Delta G$ is a free energy estimation of the interaction calculated by \textit{Autodock VINA} (given in \textit{kcal/mol}) and $d$ is the distance between the heme iron and the $C_{5}$ of mesotrione for $ n $ in binding poses \textbf{(figure \ref{score})}. 
+Where $C_{5}$ is the target carbon for hydroxylation. 
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{img/score.png}
-	\caption{\label{score} - Distance $d$  between carbon $C_5$ of mesotrione and the heme iron of BM3, used in the fitness score (\AA)}
+	\caption{\label{score} - Distance $d$  between carbon $C_5$ of mesotrione and the heme iron of BM3, used in the fitness score (\AA) marked by a yellow dashed line.}
 \end{figure}
 
 \subsection{Genetic Algorithm \label{ga}}

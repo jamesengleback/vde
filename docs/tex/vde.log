@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2022.6.22)  27 JUN 2022 08:53
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2022.6.22)  27 JUN 2022 09:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -843,6 +843,9 @@ Overfull \hbox (26.74538pt too wide) in paragraph at lines 102--102
 File: img/score.png Graphic file (type bmp)
 <img/score.png>
  [5] [6] (./vde.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `vde.out' has not changed.
 (rerunfilecheck)             Checksum: 206B895E4848A9ADED5991584AD7D420;3264.
 Package logreq Info: Writing requests to 'vde.run.xml'.
