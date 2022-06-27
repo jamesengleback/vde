@@ -92,6 +92,60 @@
       \field{pages}{455\bibrangedash 461}
       \range{pages}{7}
     \endentry
+    \entry{o2011open}{article}{}
+      \name{author}{6}{}{%
+        {{hash=dcc2f26bfc77d1f4628266470df48a63}{%
+           family={O'Boyle},
+           familyi={O\bibinitperiod},
+           given={Noel\bibnamedelima M},
+           giveni={N\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=625de35562df25866fb22ddd7dc8453a}{%
+           family={Banck},
+           familyi={B\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=fe15ee767c6779c961968a1d439b6fc1}{%
+           family={James},
+           familyi={J\bibinitperiod},
+           given={Craig\bibnamedelima A},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=687110fbe6675b67b8a1a96fb1de00d8}{%
+           family={Morley},
+           familyi={M\bibinitperiod},
+           given={Chris},
+           giveni={C\bibinitperiod}}}%
+        {{hash=a1356070b4bdb67b7c411f697d26b09c}{%
+           family={Vandermeersch},
+           familyi={V\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+        {{hash=39617e91b5dc1ece7f805a3d5b678fcb}{%
+           family={Hutchison},
+           familyi={H\bibinitperiod},
+           given={Geoffrey\bibnamedelima R},
+           giveni={G\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {BioMed Central}%
+      }
+      \strng{namehash}{4f0052e450e42c4dc73192c4f8533e26}
+      \strng{fullhash}{9fb437743bcab1ccbbeaba7580269b9e}
+      \strng{bibnamehash}{4f0052e450e42c4dc73192c4f8533e26}
+      \strng{authorbibnamehash}{4f0052e450e42c4dc73192c4f8533e26}
+      \strng{authornamehash}{4f0052e450e42c4dc73192c4f8533e26}
+      \strng{authorfullhash}{9fb437743bcab1ccbbeaba7580269b9e}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of cheminformatics}
+      \field{number}{1}
+      \field{title}{Open Babel: An open chemical toolbox}
+      \field{volume}{3}
+      \field{year}{2011}
+      \field{pages}{1\bibrangedash 14}
+      \range{pages}{14}
+    \endentry
     \entry{dunbrack1993backbone}{article}{}
       \name{author}{2}{}{%
         {{hash=6634b0aef3d39acfb5aa218efb52e896}{%
@@ -114,8 +168,8 @@
       \strng{authorbibnamehash}{beb2e24a0697cdea8f2149eaa8b608b8}
       \strng{authornamehash}{beb2e24a0697cdea8f2149eaa8b608b8}
       \strng{authorfullhash}{beb2e24a0697cdea8f2149eaa8b608b8}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Journal of molecular biology}
@@ -125,6 +179,50 @@
       \field{year}{1993}
       \field{pages}{543\bibrangedash 574}
       \range{pages}{32}
+    \endentry
+    \entry{moser2008distance}{article}{}
+      \name{author}{4}{}{%
+        {{hash=b11ccb7a76f01b2e2eeafd3fe5208698}{%
+           family={Moser},
+           familyi={M\bibinitperiod},
+           given={Christopher\bibnamedelima C},
+           giveni={C\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+        {{hash=f083216dec5572c8d9b886ec7700845c}{%
+           family={Chobot},
+           familyi={C\bibinitperiod},
+           given={Sarah\bibnamedelima E},
+           giveni={S\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=5caf736633dc860bc0c193311179444b}{%
+           family={Page},
+           familyi={P\bibinitperiod},
+           given={Christopher\bibnamedelima C},
+           giveni={C\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+        {{hash=e440f319eceeed2eb655524dd18b76aa}{%
+           family={Dutton},
+           familyi={D\bibinitperiod},
+           given={P\bibnamedelima Leslie},
+           giveni={P\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{ca87a75b5928051c4634b8083e0dd994}
+      \strng{fullhash}{6d8f6249ededbc4747d451f32058c160}
+      \strng{bibnamehash}{ca87a75b5928051c4634b8083e0dd994}
+      \strng{authorbibnamehash}{ca87a75b5928051c4634b8083e0dd994}
+      \strng{authornamehash}{ca87a75b5928051c4634b8083e0dd994}
+      \strng{authorfullhash}{6d8f6249ededbc4747d451f32058c160}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Biochimica et Biophysica Acta (BBA)-Bioenergetics}
+      \field{number}{7-8}
+      \field{title}{Distance metrics for heme protein electron tunneling}
+      \field{volume}{1777}
+      \field{year}{2008}
+      \field{pages}{1032\bibrangedash 1037}
+      \range{pages}{6}
     \endentry
   \enddatalist
 \endrefsection

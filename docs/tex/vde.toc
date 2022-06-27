@@ -17,6 +17,7 @@
 \contentsline {subsection}{\numberline {3.1}\texttt {enz} }{4}{subsection.3.1}%
 \contentsline {subsection}{\numberline {3.2}Score function }{4}{subsection.3.2}%
 \contentsline {subsection}{\numberline {3.3}Genetic Algorithm }{6}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Cloud Deployment }{6}{subsection.3.4}%
-\contentsline {section}{\numberline {4}Results}{6}{section.4}%
-\contentsline {section}{\numberline {5}Discussion and Future Work}{6}{section.5}%
+\contentsline {subsection}{\numberline {3.4}Main Function }{6}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Cloud Deployment }{7}{subsection.3.5}%
+\contentsline {section}{\numberline {4}Results}{7}{section.4}%
+\contentsline {section}{\numberline {5}Discussion and Future Work}{7}{section.5}%

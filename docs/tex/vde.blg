@@ -1,15 +1,15 @@
 [0] Config.pm:307> INFO - This is Biber 2.17
 [0] Config.pm:310> INFO - Logfile is 'vde.blg'
-[41] biber:340> INFO - === Mon Jun 27, 2022, 08:48:19
+[41] biber:340> INFO - === Mon Jun 27, 2022, 15:13:45
 [49] Biber.pm:418> INFO - Reading 'vde.bcf'
-[87] Biber.pm:972> INFO - Found 3 citekeys in bib section 0
-[95] Biber.pm:4383> INFO - Processing section 0
-[101] Biber.pm:4574> INFO - Looking for bibtex file 'vde.bib' for section 0
-[102] bibtex.pm:1713> INFO - LaTeX decoding ...
-[116] bibtex.pm:1518> INFO - Found BibTeX data source 'vde.bib'
-[147] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[147] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[147] Biber.pm:4203> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'en-US'
-[148] Biber.pm:4209> INFO - No sort tailoring available for locale 'en-US'
-[149] bbl.pm:654> INFO - Writing 'vde.bbl' with encoding 'UTF-8'
-[150] bbl.pm:757> INFO - Output to vde.bbl
+[88] Biber.pm:972> INFO - Found 5 citekeys in bib section 0
+[96] Biber.pm:4383> INFO - Processing section 0
+[102] Biber.pm:4574> INFO - Looking for bibtex file 'vde.bib' for section 0
+[103] bibtex.pm:1713> INFO - LaTeX decoding ...
+[119] bibtex.pm:1518> INFO - Found BibTeX data source 'vde.bib'
+[160] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[160] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[160] Biber.pm:4203> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'en-US'
+[160] Biber.pm:4209> INFO - No sort tailoring available for locale 'en-US'
+[163] bbl.pm:654> INFO - Writing 'vde.bbl' with encoding 'UTF-8'
+[165] bbl.pm:757> INFO - Output to vde.bbl

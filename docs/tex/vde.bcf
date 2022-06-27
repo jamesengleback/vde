@@ -2346,10 +2346,17 @@
   <bcf:section number="0">
     <bcf:citekey order="1">chaudhury2010pyrosetta</bcf:citekey>
     <bcf:citekey order="2">trott2010autodock</bcf:citekey>
-    <bcf:citekey order="3">dunbrack1993backbone</bcf:citekey>
-    <bcf:citekey order="4">chaudhury2010pyrosetta</bcf:citekey>
-    <bcf:citekey order="5">trott2010autodock</bcf:citekey>
+    <bcf:citekey order="3">o2011open</bcf:citekey>
+    <bcf:citekey order="4">dunbrack1993backbone</bcf:citekey>
+    <bcf:citekey order="5">moser2008distance</bcf:citekey>
     <bcf:citekey order="6">dunbrack1993backbone</bcf:citekey>
+    <bcf:citekey order="7">chaudhury2010pyrosetta</bcf:citekey>
+    <bcf:citekey order="8">trott2010autodock</bcf:citekey>
+    <bcf:citekey order="9">chaudhury2010pyrosetta</bcf:citekey>
+    <bcf:citekey order="10">trott2010autodock</bcf:citekey>
+    <bcf:citekey order="11">o2011open</bcf:citekey>
+    <bcf:citekey order="12">dunbrack1993backbone</bcf:citekey>
+    <bcf:citekey order="13">moser2008distance</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">
