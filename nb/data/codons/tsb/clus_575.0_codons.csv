@@ -1,0 +1,26 @@
+codon,expansion,num_variants,amino_acids
+ASA,"['ACA', 'AGA']",2,"['R', 'T']"
+RMC,"['AAC', 'ACC', 'GAC', 'GCC']",4,"['A', 'N', 'T', 'D']"
+TAT,['TAT'],1,['Y']
+SKG,"['CGG', 'CTG', 'GGG', 'GTG']",4,"['G', 'L', 'R', 'V']"
+KTT,"['GTT', 'TTT']",2,"['F', 'V']"
+WSC,"['ACC', 'AGC', 'TCC', 'TGC']",4,"['C', 'S', 'T']"
+AAA,['AAA'],1,['K']
+MWK,"['AAG', 'AAT', 'ATG', 'ATT', 'CAG', 'CAT', 'CTG', 'CTT']",8,"['H', 'M', 'I', 'K', 'L', 'N', 'Q']"
+CCG,['CCG'],1,['P']
+VMW,"['AAA', 'AAT', 'ACA', 'ACT', 'CAA', 'CAT', 'CCA', 'CCT', 'GAA', 'GAT', 'GCA', 'GCT']",12,"['E', 'H', 'T', 'A', 'D', 'K', 'N', 'P', 'Q']"
+BWW,"['CAA', 'CAT', 'CTA', 'CTT', 'GAA', 'GAT', 'GTA', 'GTT', 'TAA', 'TAT', 'TTA', 'TTT']",12,"['D', 'E', 'H', 'V', 'Y', 'F', 'L', 'Q', 'Stop']"
+VMK,"['AAG', 'AAT', 'ACG', 'ACT', 'CAG', 'CAT', 'CCG', 'CCT', 'GAG', 'GAT', 'GCG', 'GCT']",12,"['A', 'N', 'Q', 'D', 'E', 'H', 'K', 'P', 'T']"
+BKG,"['CGG', 'CTG', 'GGG', 'GTG', 'TGG', 'TTG']",6,"['G', 'L', 'W', 'R', 'V']"
+HWW,"['AAA', 'AAT', 'ATA', 'ATT', 'CAA', 'CAT', 'CTA', 'CTT', 'TAA', 'TAT', 'TTA', 'TTT']",12,"['F', 'H', 'K', 'I', 'L', 'N', 'Q', 'Y', 'Stop']"
+MGT,"['AGT', 'CGT']",2,"['R', 'S']"
+GAA,['GAA'],1,['E']
+RVA,"['AAA', 'ACA', 'AGA', 'GAA', 'GCA', 'GGA']",6,"['A', 'K', 'R', 'E', 'G', 'T']"
+RMT,"['AAT', 'ACT', 'GAT', 'GCT']",4,"['D', 'T', 'A', 'N']"
+MYT,"['ACT', 'ATT', 'CCT', 'CTT']",4,"['I', 'P', 'L', 'T']"
+RYK,"['ACG', 'ACT', 'ATG', 'ATT', 'GCG', 'GCT', 'GTG', 'GTT']",8,"['A', 'I', 'M', 'T', 'V']"
+BSG,"['CCG', 'CGG', 'GCG', 'GGG', 'TCG', 'TGG']",6,"['A', 'P', 'W', 'G', 'R', 'S']"
+GCA,['GCA'],1,['A']
+GCA,['GCA'],1,['A']
+KRT,"['GAT', 'GGT', 'TAT', 'TGT']",4,"['G', 'Y', 'C', 'D']"
+CTG,['CTG'],1,['L']

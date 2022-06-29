@@ -1,0 +1,26 @@
+codon,expansion,num_variants,amino_acids
+SGT,"['CGT', 'GGT']",2,"['G', 'R']"
+ACC,['ACC'],1,['T']
+TRT,"['TAT', 'TGT']",2,"['C', 'Y']"
+CTG,['CTG'],1,['L']
+GTT,['GTT'],1,['V']
+ACC,['ACC'],1,['T']
+WWW,"['AAA', 'AAT', 'ATA', 'ATT', 'TAA', 'TAT', 'TTA', 'TTT']",8,"['F', 'K', 'I', 'L', 'N', 'Y', 'Stop']"
+CAT,['CAT'],1,['H']
+CCG,['CCG'],1,['P']
+ACC,['ACC'],1,['T']
+GTT,['GTT'],1,['V']
+GCA,['GCA'],1,['A']
+CYG,"['CCG', 'CTG']",2,"['L', 'P']"
+TTT,['TTT'],1,['F']
+AGC,['AGC'],1,['S']
+GAA,['GAA'],1,['E']
+CRG,"['CAG', 'CGG']",2,"['Q', 'R']"
+ACC,['ACC'],1,['T']
+RYT,"['ACT', 'ATT', 'GCT', 'GTT']",4,"['A', 'I', 'T', 'V']"
+GCA,['GCA'],1,['A']
+GCA,['GCA'],1,['A']
+SCG,"['CCG', 'GCG']",2,"['A', 'P']"
+GCA,['GCA'],1,['A']
+SGT,"['CGT', 'GGT']",2,"['G', 'R']"
+CTG,['CTG'],1,['L']
